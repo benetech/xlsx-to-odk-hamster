@@ -1,32 +1,25 @@
 package org.benetech.xlsxodk.conversion;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.benetech.xlsxjson.Converter;
-import org.benetech.xlsxjson.ConverterBuilder;
-import org.benetech.xlsxodk.Xlsx2OdkConverter;
-import org.benetech.xlsxodk.Xlsx2OdkConverterBuilder;
-import org.benetech.xlsxodk.exception.OdkXlsValidationException;
+import org.benetech.xlsxjson.Xlsx2JsonConverter;
+import org.benetech.xlsxjson.Xlsx2JsonConverterBuilder;
+import org.benetech.xlsxodk.PredefSheet;
 import org.benetech.xlsxodk.util.ConversionUtils;
-import org.benetech.xlsxodk.validation.SettingsValidator;
-
-import com.google.gson.Gson;
-
-import org.junit.*;
+import org.junit.Test;
 
 public class LocalesTest {
 
@@ -70,29 +63,36 @@ public class LocalesTest {
   public void testConstructLocales() throws Exception {
     URL url = this.getClass().getResource("/poverty_stoplight_madison.xlsx");
     File xlsxFile = new File(url.getFile());
-    ConverterBuilder builder = new ConverterBuilder();
+    Xlsx2JsonConverterBuilder builder = new Xlsx2JsonConverterBuilder();
     builder.dotsToNested(true);
-    Converter converter = builder.build();
+    Xlsx2JsonConverter converter = builder.build();
 
     Map<String, List<Map<String, Object>>> javaCollections =
         converter.convertToJavaCollections(xlsxFile);
 
     SettingsConverter settingsConverter = new SettingsConverter();
     settingsConverter.settingsRowList =
-        ConversionUtils.omitRowsWithMissingField(javaCollections.get("settings"), "setting_name");
+        ConversionUtils.omitRowsWithMissingField(javaCollections.get(PredefSheet.SETTINGS.getSheetName()), SettingsConverter.SETTING_NAME_FIELD);
     logger.info(settingsConverter.settingsRowList);
 
-    
     settingsConverter.settingsMap =
-        SettingsConverter.toSettingsMap(settingsConverter.settingsRowList);
+        ConversionUtils.toMap(settingsConverter.settingsRowList,  SettingsConverter.SETTING_NAME_FIELD);
     logger.info(settingsConverter.settingsMap);
-
     
     settingsConverter.constructLocaleBlock();
 
     logger.info(settingsConverter.defaultLocale);
     logger.info(settingsConverter.locales);
 
+    assertThat((String)settingsConverter.defaultLocale.get(SettingsConverter.SETTING_NAME_FIELD), is("_default_locale"));
+    assertThat((String)settingsConverter.defaultLocale.get("value"), is("default"));
+    
+    assertThat((String) settingsConverter.locales.get(SettingsConverter.SETTING_NAME_FIELD), is("_locales"));
+    assertTrue(settingsConverter.locales.get("value") instanceof List<?>);
+    List<Map<String,Object>> valueList = (List<Map<String, Object>>) settingsConverter.locales.get("value");
+
+    String[] names = {(String)valueList.get(0).get("name"), (String)valueList.get(1).get("name")};
+    assertThat(Arrays.asList(names), containsInAnyOrder("default", "spanish"));
   }
 
 }

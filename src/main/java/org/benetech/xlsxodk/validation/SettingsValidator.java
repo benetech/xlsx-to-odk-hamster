@@ -1,21 +1,25 @@
 package org.benetech.xlsxodk.validation;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.benetech.xlsxodk.PredefSheet;
+import org.benetech.xlsxodk.conversion.SettingsConverter;
 import org.benetech.xlsxodk.exception.OdkXlsValidationException;
+import org.benetech.xlsxodk.util.SettingsSheetUtils;
+import org.benetech.xlsxodk.util.ValidationUtils;
 
 public class SettingsValidator {
   public static final int TABLE_NAME_LENGTH = 50;
-  
+
 
   public static void validate(List<Map<String, Object>> settingsRowList,
       Map<String, Map<String, Object>> settingsMap) {
 
-    checkDuplicates(settingsRowList);
+    ValidationUtils.checkDuplicates(PredefSheet.SETTINGS.getSheetName(), settingsRowList,
+        SettingsConverter.SETTING_NAME_FIELD);
     checkTableId(settingsMap);
     checkFormId(settingsMap, settingsRowList);
     checkSurveyDisplayFields(settingsMap);
@@ -40,7 +44,7 @@ public class SettingsValidator {
       List<Map<String, Object>> settingsRowList) {
     if (settingsMap.get("form_id") == null || settingsMap.get("form_id").get("value") == null) {
       String tableIdValue = (String) settingsMap.get("table_id").get("value");
-      Map<String, Object> newSettingRow = new HashMap<String, Object>();
+      Map<String, Object> newSettingRow = new LinkedHashMap<String, Object>();
       newSettingRow.put("setting_name", "form_id");
       newSettingRow.put("value", tableIdValue);
       settingsRowList.add(newSettingRow);
@@ -56,11 +60,7 @@ public class SettingsValidator {
   }
 
   static void checkSurveyDisplayFields(Map<String, Map<String, Object>> settingsMap) {
-    Map<String, Object> surveyRow = settingsMap.get("survey");
-    if (surveyRow == null) {
-      throw new OdkXlsValidationException(
-          "Please define a 'survey' setting_name on the settings sheet and specify the survey title under display.title");
-    }
+    Map<String, Object> surveyRow = SettingsSheetUtils.safeGetSurveySettingsRow(settingsMap);
     Object display = surveyRow.get("display");
     if (display == null || (display instanceof String && StringUtils.isEmpty((String) display))) {
       throw new OdkXlsValidationException(
@@ -75,26 +75,4 @@ public class SettingsValidator {
 
 
 
-  static void checkDuplicates(List<Map<String, Object>> settingsRowList) {
-    Map<String, Integer> counts = new HashMap<String, Integer>();
-    for (Map<String, Object> row : settingsRowList) {
-      if (counts.get(row.get("setting_name")) == null) {
-        counts.put((String) row.get("setting_name"), new Integer(1));
-      } else {
-        counts.put((String) row.get("setting_name"), counts.get(row.get("setting_name")) + 1);
-      }
-    }
-
-    List<String> duplicateSettings = counts.entrySet().stream().filter(map -> map.getValue() > 1)
-        .map(map -> map.getKey()).collect(Collectors.toList());
-
-    if (duplicateSettings.size() > 0) {
-      throw new OdkXlsValidationException(
-          "The following settings are duplicated on the duplicates page: "
-              + StringUtils.join(duplicateSettings));
-    }
-  }
-
-
-  
 }

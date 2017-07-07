@@ -1,0 +1,149 @@
+package org.benetech.xlsxodk.conversion;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.benetech.xlsxodk.Constants;
+import org.benetech.xlsxodk.PredefSheet;
+import org.benetech.xlsxodk.validation.SpecificationValidator;
+
+/**
+ * Ties together all of the parts of the Specification block of formDef.json
+ */
+public class SpecificationConverter {
+
+  Map<String, Object> specification;
+
+  Map<String, Object> promptTypes;
+
+  List<String> sectionNames;
+
+  Map<String, List<Map<String, Object>>> sectionSheets;
+
+  public SpecificationConverter(Map<String, List<Map<String, Object>>> originalXlsx) {
+    specification = new LinkedHashMap<String, Object>();
+    addColumnTypesSection();
+    addSettingsSection(originalXlsx);
+    addChoicesSection(originalXlsx);
+    addQueriesSection(originalXlsx);
+    addCalculatesSection(originalXlsx);
+    setPromptTypes(originalXlsx);
+    addModelSection(originalXlsx);
+    setSectionSheets(originalXlsx);
+    addInitialSection();
+    Collections.sort(sectionNames);
+    addSectionsToSettings();
+
+  }
+
+
+  public void addColumnTypesSection() {
+    // TODO: Add custom column types
+    specification.put("column_types", Constants.COLUMN_TYPE_MAP);
+
+  }
+
+  public void addSettingsSection(Map<String, List<Map<String, Object>>> xlsx) {
+    SettingsConverter settingsConverter =
+        new SettingsConverter(xlsx.get(PredefSheet.SETTINGS.getSheetName()));
+    specification.put(PredefSheet.SETTINGS.getSheetName(), settingsConverter.getSettingsMap());
+
+  }
+
+  public void addChoicesSection(Map<String, List<Map<String, Object>>> xlsx) {
+    ChoicesConverter choicesConverter =
+        new ChoicesConverter(xlsx.get(PredefSheet.CHOICES.getSheetName()));
+    specification.put(PredefSheet.CHOICES.getSheetName(), choicesConverter.getChoicesMap());
+
+  }
+
+  public void addQueriesSection(Map<String, List<Map<String, Object>>> xlsx) {
+    QueriesConverter queriesConverter =
+        new QueriesConverter(xlsx.get(PredefSheet.QUERIES.getSheetName()));
+    SpecificationValidator.checkQueriesChoicesColumnsDuplicates(queriesConverter.getQueriesMap(),
+        (Map<String, List<Map<String, Object>>>) specification
+            .get(PredefSheet.QUERIES.getSheetName()));
+    specification.put(PredefSheet.QUERIES.getSheetName(), queriesConverter.getQueriesMap());
+  }
+
+  public void addCalculatesSection(Map<String, List<Map<String, Object>>> xlsx) {
+    CalculatesConverter calculatesConverter =
+        new CalculatesConverter(xlsx.get(PredefSheet.CALCULATES.getSheetName()));
+    specification.put(PredefSheet.CALCULATES.getSheetName(),
+        calculatesConverter.getCalculationsMap());
+  }
+
+  public void setPromptTypes(Map<String, List<Map<String, Object>>> xlsx) {
+    PromptTypesConverter promptTypesConverter =
+        new PromptTypesConverter(xlsx.get(PredefSheet.PROMPT_TYPES.getSheetName()));
+    promptTypes = promptTypesConverter.getPromptTypeMap();
+  }
+
+  public void addModelSection(Map<String, List<Map<String, Object>>> xlsx) {
+    ModelConverter modelConverter = new ModelConverter(xlsx.get(PredefSheet.MODEL.getSheetName()));
+    specification.put(PredefSheet.MODEL.getSheetName(), modelConverter.getModelMap());
+  }
+
+  public void setSectionSheets(Map<String, List<Map<String, Object>>> xlsx) {
+    SpecificationValidator.validateSheetNames(xlsx.keySet());
+    if (sectionNames == null) {
+      sectionNames = new ArrayList<String>();
+    }
+    if (sectionSheets == null) {
+       sectionSheets = new LinkedHashMap<String, List<Map<String, Object>>>();
+    }
+    for (String sheetName : xlsx.keySet()) {
+      if (!Constants.RESERVED_SHEET_NAMES.contains(sheetName) && !(sheetName.startsWith("-"))) {
+        sectionNames.add(sheetName);
+        sectionSheets.put(sheetName, xlsx.get(sheetName));
+      }
+    }
+  }
+
+  public void addInitialSection() {
+    if (!sectionNames.contains(PredefSheet.INITIAL.getSheetName())) {
+      sectionSheets.put(PredefSheet.INITIAL.getSheetName(), Constants.DEFAULT_INITIAL);
+      sectionNames.add(PredefSheet.INITIAL.getSheetName());
+    }
+  }
+
+  public void addSectionsToSettings() {
+    Map<String, Map<String, Object>> settingsMap =
+        (Map<String, Map<String, Object>>) specification.get(PredefSheet.SETTINGS.getSheetName());
+    Object surveyDisplay = settingsMap.get("survey").get("display");
+    for (String sectionName : sectionNames) {
+      if (settingsMap.get(sectionName) == null) {
+        settingsMap.put(sectionName, new LinkedHashMap<String, Object>());
+      }
+      if (settingsMap.get(sectionName).get("display") == null) {
+        settingsMap.get(sectionName).put("display", surveyDisplay);
+      }
+    }
+  }
+
+  
+
+  public Map<String, Object> getSpecification() {
+    return specification;
+  }
+
+
+  public Map<String, Object> getPromptTypes() {
+    return promptTypes;
+  }
+
+
+  public List<String> getSectionNames() {
+    return sectionNames;
+  }
+
+
+  public Map<String, List<Map<String, Object>>> getSectionSheets() {
+    return sectionSheets;
+  }
+
+
+}

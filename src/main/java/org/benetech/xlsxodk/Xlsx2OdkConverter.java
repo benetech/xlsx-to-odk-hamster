@@ -1,28 +1,17 @@
 package org.benetech.xlsxodk;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.benetech.xlsxjson.Converter;
+import org.benetech.xlsxjson.Xlsx2JsonConverter;
+import org.benetech.xlsxjson.Xlsx2JsonConverterBuilder;
+import org.benetech.xlsxodk.conversion.SpecificationConverter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,31 +25,35 @@ public class Xlsx2OdkConverter {
   public boolean dotsToNested = true;
 
   public boolean addRowNums = true;
-  
-  private Converter xls2Json;
 
+  private Xlsx2JsonConverter xlsx2Json;
+
+  Map<String, List<Map<String, Object>>> xlsxSection;
 
   public Xlsx2OdkConverter(boolean dotsToNested, boolean addRowNums) {
     this.dotsToNested = dotsToNested;
     this.addRowNums = addRowNums;
+    Xlsx2JsonConverterBuilder builder = new Xlsx2JsonConverterBuilder();
+    builder.dotsToNested(dotsToNested);
+    builder.addRowNums(addRowNums);
+    xlsx2Json = builder.build();
   }
 
   public String convertToJson(File file) throws FileNotFoundException, IOException {
-
-
-    return xls2Json.convertToJson(file);
-
+    Map<String, Object> formDef = convertToJavaCollections(file);
+    final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    return gson.toJson(formDef);
   }
 
-  public Map<String, List<Map<String, Object>>> convertToJavaCollections(File file)
+  public Map<String, Object> convertToJavaCollections(File file)
       throws FileNotFoundException, IOException {
-
-    final Map<String, List<Map<String, Object>>> workbookMap = xls2Json.convertToJavaCollections(file);
-
-    return workbookMap;
-
+    xlsxSection = xlsx2Json.convertToJavaCollections(file);
+    SpecificationConverter specificationConverter = new SpecificationConverter(xlsxSection);
+    Map<String, Object> formDef = new LinkedHashMap<String, Object>();
+    formDef.put("xlsx", xlsxSection);
+    formDef.put("specification", specificationConverter.getSpecification());
+    return formDef;
   }
-
 
   public boolean isDotsToNested() {
     return dotsToNested;
@@ -77,7 +70,5 @@ public class Xlsx2OdkConverter {
   public void setAddRowNums(boolean addRowNums) {
     this.addRowNums = addRowNums;
   }
-  
-  
 
 }

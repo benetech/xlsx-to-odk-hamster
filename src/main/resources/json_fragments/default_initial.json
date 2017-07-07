@@ -1,0 +1,47 @@
+[
+	{
+		"_row_num": 2,
+		"clause": "if // start",
+		"condition": "(opendatakit.getCurrentInstanceId() != null)"
+	},
+	{
+		"_row_num": 3,
+		"type": "opening",
+		"display": {
+			"text": "Edit form"
+		}
+	},
+	{
+		"_row_num": 4,
+		"clause": "do section survey"
+	},
+	{
+		"_row_num": 5,
+		"type": "summary",
+		"display": {
+			"text": "Summary"
+		}
+	},
+	{
+		"_row_num": 6,
+		"type": "finalize",
+		"display": {
+			"text": "Save form"
+		}
+	},
+	{
+		"_row_num": 7,
+		"clause": "else // start"
+	},
+	{
+		"_row_num": 8,
+		"type": "instances",
+		"display": {
+			"text": "Saved instances"
+		}
+	},
+	{
+		"_row_num": 9,
+		"clause": "end if // start"
+	}
+]
