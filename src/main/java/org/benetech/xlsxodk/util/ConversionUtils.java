@@ -34,8 +34,10 @@ public class ConversionUtils {
 
   public static Map<String, Map<String, Object>> toMap(List<Map<String, Object>> rowList,
       String field) {
-    Map<String, Map<String, Object>> newSettingsMap =
-        rowList.stream().collect(Collectors.toMap(x -> (String) (x.get(field)), x -> x));
+    Map<String, Map<String, Object>> newSettingsMap = new LinkedHashMap<String, Map<String, Object>>();
+    for (Map<String, Object> row: rowList) {
+      newSettingsMap.put((String)row.get(field), row);
+    }
     return newSettingsMap;
   }
 

@@ -69,17 +69,17 @@ public class SettingsConverter {
         if (settingsMap.get(languageName) == null
             || settingsMap.get(languageName).get("display") == null) {
           final Map<String, Object> newLocale = new LinkedHashMap<String, Object>();
-          newLocale.put("name", languageName);
           newLocale.put("display", new HashMap<String, Object>());
           ((Map<String, Object>) newLocale.get("display")).put("text", languageName);
+          newLocale.put("name", languageName);
           locales.add(newLocale);
 
         } else {
           Map<String, Object> languageRow = settingsMap.get(languageName);
           final Map<String, Object> newLocale = new LinkedHashMap<String, Object>();
-          newLocale.put("name", languageName);
           newLocale.put("display", languageRow.get("display"));
           newLocale.put(Xlsx2JsonConverter.ROW_NUM_KEY, languageRow.get(Xlsx2JsonConverter.ROW_NUM_KEY));
+          newLocale.put("name", languageName);
           locales.add(newLocale);
         }
       }
