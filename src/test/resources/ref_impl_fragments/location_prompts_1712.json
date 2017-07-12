@@ -1,0 +1,26 @@
+[
+	{
+		"type": "geopoint",
+		"name": "location",
+		"display": {
+			"text": {
+				"default": "Capture your location",
+				"spanish": "Capturar su ubicación"
+			}
+		},
+		"_row_num": 5,
+		"__rowNum__": 4,
+		"_token_type": "prompt",
+		"_type": "geopoint",
+		"_branch_label_enclosing_screen": "location/_screen5",
+		"promptIdx": 0
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 6,
+		"_branch_label_enclosing_screen": "location/_screen6",
+		"promptIdx": 1
+	}
+]

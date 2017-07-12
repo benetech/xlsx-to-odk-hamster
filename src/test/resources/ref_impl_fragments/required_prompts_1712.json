@@ -1,0 +1,82 @@
+[
+	{
+		"type": "select_one_dropdown",
+		"values_list": "area_type",
+		"name": "Area",
+		"display": {
+			"text": {
+				"default": "Residential area",
+				"spanish": "Área de residencia"
+			}
+		},
+		"required": true,
+		"validation_tags": "user_info",
+		"_row_num": 13,
+		"__rowNum__": 12,
+		"_token_type": "prompt",
+		"_type": "select_one_dropdown",
+		"_branch_label_enclosing_screen": "required/_screen12",
+		"promptIdx": 0
+	},
+	{
+		"type": "note",
+		"display": {
+			"hint": {
+				"default": "<div class=\"req\">This field is required</div>",
+				"spanish": "<div class=\"req\">Este campo es requerido</div>"
+			}
+		},
+		"_row_num": 15,
+		"__rowNum__": 14,
+		"_token_type": "prompt",
+		"_type": "note",
+		"_branch_label_enclosing_screen": "required/_screen12",
+		"promptIdx": 1
+	},
+	{
+		"type": "select_one_dropdown",
+		"values_list": "principal_activity",
+		"name": "Principal",
+		"display": {
+			"text": {
+				"default": "What is your main economic activity?",
+				"spanish": "¿Cuál es su actividad económica principal?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 17,
+		"__rowNum__": 16,
+		"_token_type": "prompt",
+		"_type": "select_one_dropdown",
+		"_branch_label_enclosing_screen": "required/_screen12",
+		"promptIdx": 2
+	},
+	{
+		"type": "select_one_dropdown",
+		"values_list": "secondary_activity",
+		"name": "Secondary",
+		"display": {
+			"text": {
+				"default": "What is your secondary economic activity?",
+				"spanish": "¿Cuál es su actividad económica secundaria?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 18,
+		"__rowNum__": 17,
+		"_token_type": "prompt",
+		"_type": "select_one_dropdown",
+		"_branch_label_enclosing_screen": "required/_screen12",
+		"promptIdx": 3
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 20,
+		"_branch_label_enclosing_screen": "required/_screen20",
+		"promptIdx": 4
+	}
+]

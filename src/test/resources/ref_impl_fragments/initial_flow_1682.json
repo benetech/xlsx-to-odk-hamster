@@ -1,0 +1,63 @@
+[
+	{
+		"_row_num": 2,
+		"clause": "if // start",
+		"condition": "(opendatakit.getCurrentInstanceId() != null)",
+		"_token_type": "begin_if",
+		"_tag_name": "start"
+	},
+	{
+		"_row_num": 3,
+		"type": "opening",
+		"display": {
+			"text": "Edit form"
+		},
+		"_token_type": "prompt",
+		"_type": "opening"
+	},
+	{
+		"_row_num": 4,
+		"clause": "do section survey",
+		"_token_type": "do_section",
+		"_do_section_name": "survey"
+	},
+	{
+		"_row_num": 5,
+		"type": "summary",
+		"display": {
+			"text": "Summary"
+		},
+		"_token_type": "prompt",
+		"_type": "summary"
+	},
+	{
+		"_row_num": 6,
+		"type": "finalize",
+		"display": {
+			"text": "Save form"
+		},
+		"_token_type": "prompt",
+		"_type": "finalize"
+	},
+	{
+		"_row_num": 7,
+		"clause": "else // start",
+		"_token_type": "else",
+		"_tag_name": "start"
+	},
+	{
+		"_row_num": 8,
+		"type": "instances",
+		"display": {
+			"text": "Saved instances"
+		},
+		"_token_type": "prompt",
+		"_type": "instances"
+	},
+	{
+		"_row_num": 9,
+		"clause": "end if // start",
+		"_token_type": "end_if",
+		"_tag_name": "start"
+	}
+]

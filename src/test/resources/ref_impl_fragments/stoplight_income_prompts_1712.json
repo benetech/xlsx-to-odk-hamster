@@ -1,0 +1,140 @@
+[
+	{
+		"type": "select_one_slider",
+		"values_list": "stable_income",
+		"name": "stable",
+		"display": {
+			"text": {
+				"default": "Stable income",
+				"spanish": "Ingresos estables"
+			}
+		},
+		"_row_num": 7,
+		"__rowNum__": 6,
+		"_token_type": "prompt",
+		"_type": "select_one_slider",
+		"_branch_label_enclosing_screen": "stoplight_income/_screen6",
+		"promptIdx": 0
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Red selected",
+				"spanish": "Rojo seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 9,
+		"__rowNum__": 8,
+		"_token_type": "prompt",
+		"_type": "note",
+		"_branch_label_enclosing_screen": "stoplight_income/_screen6",
+		"promptIdx": 1
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Yellow selected",
+				"spanish": "Amarillo seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 12,
+		"__rowNum__": 11,
+		"_token_type": "prompt",
+		"_type": "note",
+		"_branch_label_enclosing_screen": "stoplight_income/_screen6",
+		"promptIdx": 2
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Green selected",
+				"spanish": "Verde seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 15,
+		"__rowNum__": 14,
+		"_token_type": "prompt",
+		"_type": "note",
+		"_branch_label_enclosing_screen": "stoplight_income/_screen6",
+		"promptIdx": 3
+	},
+	{
+		"type": "select_one_slider",
+		"values_list": "credit_values",
+		"name": "credit",
+		"display": {
+			"text": {
+				"default": "Credit",
+				"spanish": "Crédito"
+			}
+		},
+		"_row_num": 19,
+		"__rowNum__": 18,
+		"_token_type": "prompt",
+		"_type": "select_one_slider",
+		"_branch_label_enclosing_screen": "stoplight_income/_screen18",
+		"promptIdx": 4
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Red selected",
+				"spanish": "Rojo seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 21,
+		"__rowNum__": 20,
+		"_token_type": "prompt",
+		"_type": "note",
+		"_branch_label_enclosing_screen": "stoplight_income/_screen18",
+		"promptIdx": 5
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Yellow selected",
+				"spanish": "Amarillo seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 24,
+		"__rowNum__": 23,
+		"_token_type": "prompt",
+		"_type": "note",
+		"_branch_label_enclosing_screen": "stoplight_income/_screen18",
+		"promptIdx": 6
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Green selected",
+				"spanish": "Verde seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 27,
+		"__rowNum__": 26,
+		"_token_type": "prompt",
+		"_type": "note",
+		"_branch_label_enclosing_screen": "stoplight_income/_screen18",
+		"promptIdx": 7
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 30,
+		"_branch_label_enclosing_screen": "stoplight_income/_screen30",
+		"promptIdx": 8
+	}
+]

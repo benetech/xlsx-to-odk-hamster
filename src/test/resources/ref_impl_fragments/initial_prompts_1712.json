@@ -1,0 +1,69 @@
+[
+	{
+		"_row_num": 3,
+		"type": "opening",
+		"display": {
+			"text": "Edit form"
+		},
+		"_token_type": "prompt",
+		"_type": "opening",
+		"_branch_label_enclosing_screen": "initial/_screen3",
+		"promptIdx": 0
+	},
+	{
+		"_row_num": 4,
+		"clause": "do section survey",
+		"_token_type": "prompt",
+		"_do_section_name": "survey",
+		"_type": "_section",
+		"promptIdx": 1,
+		"display": {
+			"title": {
+				"default": "Poverty Stoplight Example",
+				"spanish": "El Semáforo de Eliminación de Pobreza"
+			}
+		},
+		"_branch_label_enclosing_screen": "survey/0"
+	},
+	{
+		"_row_num": 5,
+		"type": "summary",
+		"display": {
+			"text": "Summary"
+		},
+		"_token_type": "prompt",
+		"_type": "summary",
+		"_branch_label_enclosing_screen": "initial/_screen5",
+		"promptIdx": 2
+	},
+	{
+		"_row_num": 6,
+		"type": "finalize",
+		"display": {
+			"text": "Save form"
+		},
+		"_token_type": "prompt",
+		"_type": "finalize",
+		"_branch_label_enclosing_screen": "initial/_screen6",
+		"promptIdx": 3
+	},
+	{
+		"_row_num": 8,
+		"type": "instances",
+		"display": {
+			"text": "Saved instances"
+		},
+		"_token_type": "prompt",
+		"_type": "instances",
+		"_branch_label_enclosing_screen": "initial/_screen8",
+		"promptIdx": 4
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 10,
+		"_branch_label_enclosing_screen": "initial/_screen10",
+		"promptIdx": 5
+	}
+]

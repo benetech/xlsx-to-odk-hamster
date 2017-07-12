@@ -1,0 +1,144 @@
+[
+	{
+		"_token_type": "branch_label",
+		"branch_label": "welcome_screen",
+		"_row_num": 11
+	},
+	{
+		"type": "user_branch",
+		"values_list": "which_section",
+		"display": {
+			"text": {
+				"default": "Choose a survey to fill out",
+				"spanish": "Elija una encuesta para rellenar"
+			}
+		},
+		"_row_num": 12,
+		"__rowNum__": 11,
+		"_token_type": "prompt",
+		"_type": "user_branch"
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 13,
+		"__rowNum__": 12,
+		"_token_type": "goto_label",
+		"_branch_label": "welcome_screen"
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "stoplight_income_form",
+		"_row_num": 14
+	},
+	{
+		"comments": "To go to section we use command \"do section\" + name of section",
+		"clause": "do section stoplight_income",
+		"_row_num": 15,
+		"__rowNum__": 14,
+		"_token_type": "do_section",
+		"_do_section_name": "stoplight_income"
+	},
+	{
+		"comments": "\"go to\" command is used to go back to menu screen",
+		"clause": "goto welcome_screen",
+		"_row_num": 16,
+		"__rowNum__": 15,
+		"_token_type": "goto_label",
+		"_branch_label": "welcome_screen"
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "required_form",
+		"_row_num": 17
+	},
+	{
+		"clause": "do section required",
+		"_row_num": 18,
+		"__rowNum__": 17,
+		"_token_type": "do_section",
+		"_do_section_name": "required"
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 19,
+		"__rowNum__": 18,
+		"_token_type": "goto_label",
+		"_branch_label": "welcome_screen"
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "economic_form",
+		"_row_num": 20
+	},
+	{
+		"clause": "do section economic",
+		"_row_num": 21,
+		"__rowNum__": 20,
+		"_token_type": "do_section",
+		"_do_section_name": "economic"
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 22,
+		"__rowNum__": 21,
+		"_token_type": "goto_label",
+		"_branch_label": "welcome_screen"
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "location_form",
+		"_row_num": 23
+	},
+	{
+		"clause": "do section location",
+		"_row_num": 24,
+		"__rowNum__": 23,
+		"_token_type": "do_section",
+		"_do_section_name": "location"
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 25,
+		"__rowNum__": 24,
+		"_token_type": "goto_label",
+		"_branch_label": "welcome_screen"
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "picture_form",
+		"_row_num": 26
+	},
+	{
+		"clause": "do section picture",
+		"_row_num": 27,
+		"__rowNum__": 26,
+		"_token_type": "do_section",
+		"_do_section_name": "picture"
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 28,
+		"__rowNum__": 27,
+		"_token_type": "goto_label",
+		"_branch_label": "welcome_screen"
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "exitpath",
+		"_row_num": 29
+	},
+	{
+		"clause": "validate user_info",
+		"_row_num": 30,
+		"__rowNum__": 29,
+		"_token_type": "validate",
+		"_sweep_name": "user_info"
+	},
+	{
+		"comments": "This line is used to validate if user completed all the required fields in survey in case of skipping any section",
+		"clause": "exit section",
+		"_row_num": 31,
+		"__rowNum__": 30,
+		"_token_type": "exit_section"
+	}
+]

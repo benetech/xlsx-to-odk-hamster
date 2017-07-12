@@ -4,8 +4,11 @@ import static org.benetech.xlsxjson.Xlsx2JsonConverter.ROW_NUM_KEY;
 import static org.benetech.xlsxodk.PredefSheet.INITIAL;
 import static org.benetech.xlsxodk.ClauseToken.IF;
 import static org.benetech.xlsxodk.ClauseToken.*;
+import static org.benetech.xlsxodk.UnderscoreToken.*;
 import static org.benetech.xlsxodk.TopLevelBlockToken.ASSIGN;
 import static org.benetech.xlsxodk.TopLevelBlockToken.*;
+import static org.benetech.xlsxodk.SectionToken.*;
+import static org.benetech.xlsxodk.Token.*;
 import static org.benetech.xlsxodk.TopLevelBlockToken.BACK_IN_HISTORY;
 import static org.benetech.xlsxodk.TopLevelBlockToken.BEGIN_IF;
 import static org.benetech.xlsxodk.TopLevelBlockToken.BEGIN_SCREEN;
@@ -16,24 +19,32 @@ import static org.benetech.xlsxodk.TopLevelBlockToken.GOTO_LABEL;
 import static org.benetech.xlsxodk.TopLevelBlockToken.PROMPT;
 import static org.benetech.xlsxodk.TopLevelBlockToken.SAVE_AND_TERMINATE;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.benetech.xlsxodk.ClauseToken;
-import org.benetech.xlsxodk.FileLoadTest;
-import org.benetech.xlsxodk.PredefSheet;
+
 import org.benetech.xlsxodk.TopLevelBlockToken;
 import org.benetech.xlsxodk.exception.OdkXlsValidationException;
 import org.benetech.xlsxodk.util.ValidationUtils;
+import org.benetech.xlsxodk.util._Dumper;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class SectionParser {
-  
+
   Log logger = LogFactory.getLog(SectionParser.class);
 
 
@@ -47,38 +58,19 @@ public class SectionParser {
   private static final String CONSTRAINT = "constraint";
   private static final String CONTENTS = "contents";
   private static final String DISPLAY = "display";
+  private static final String EXIT_SPACE_SECTION = "exit section";
   private static final String FINALIZE = "finalize";
   private static final String IDX = "idx";
-  private static final String NAME = "name";
   private static final String OPERATION_IDX = "operationIdx";
   private static final String PROMPT_IDX = "promptIdx";
   private static final String REQUIRED = "required";
   private static final String RESUME = "resume";
   private static final String SCREEN = "screen";
   private static final String SCREEN_BLOCK = "screen_block";
-  private static final String SECTION = "section";
   private static final String SAVE = "save";
   private static final String TERMINATE = "terminate";
-  private static final String TYPE = "type";
   private static final String VALIDATION_TAGS = "validation_tags";
 
-  private static final String _BRANCH_LABEL = "_branch_label";
-  private static final String _BRANCH_LABEL_ENCLOSING_SCREEN = "_branch_label_enclosing_screen";
-  private static final String _CONTENTS = "_contents";
-  private static final String _DATA_TYPE = "_data_type";
-  private static final String _DO_SECTION_NAME = "_do_section_name";
-  private static final String _ELSE_BLOCK = "_else_block";
-  private static final String _ELSE_CLAUSE = "_else_clause";
-  private static final String _END_IF_CLAUSE = "_end_if_clause";
-  private static final String _END_SCREEN_CLAUSE = "_end_screen_clause";
-  private static final String _FINALIZE = "_finalize";
-  private static final String _SCREEN_BLOCK = "_screen_block";
-  private static final String _SECTION = "_section";
-  private static final String _SWEEP_NAME = "_sweep_name";
-  private static final String _TAG_NAME = "_tag_name";
-  private static final String _THEN_BLOCK = "_then_block";
-  private static final String _TOKEN_TYPE = "_token_type";
-  private static final String _TYPE = "_type";
 
   public Map<String, Map<String, Object>> parseSections(List<String> sectionNames,
       Map<String, List<Map<String, Object>>> sections, Map<String, Map<String, Object>> settings,
@@ -92,58 +84,170 @@ public class SectionParser {
       newSections.put(sectionName, newSection);
     }
 
+    /*
+     * Verify sections are not co-routines or cyclical.
+     *
+     * for each section for each reachable section accummulate the nested sections of the reachable
+     * sections. construct reached-by list
+     *
+     * for each section for each reac
+     */
+    int i = 0;
+    int len = newSections.size();
+
+    int base = 1;
+    while (base <= len) {
+      base = 2 * base;
+    }
+    for (i = 1; i <= base; i = 2 * i) {
+      for (Entry<String, Map<String, Object>> sectionEntry : newSections.entrySet()) {
+        Map<String, Object> section = sectionEntry.getValue();
+        String newSectionName = sectionEntry.getKey();
+
+        Map<String, Boolean> newReachable = new LinkedHashMap<String, Boolean>();
+        Map<String, Boolean> reachableSections =
+            (Map<String, Boolean>) (section.get(REACHABLE_SECTIONS.getText()));
+
+        for (Entry<String, Boolean> reachableEntry : reachableSections.entrySet()) {
+          String sectionName = reachableEntry.getKey();
+          Boolean reached = reachableEntry.getValue();
+          newReachable.put(sectionName, Boolean.TRUE);
+          if (newSections.get(sectionName) != null) {
+            Map<String, Boolean> depthOneReachableSections =
+                (Map<String, Boolean>) (newSections.get(sectionName).get(REACHABLE_SECTIONS.getText()));
+            for (Entry<String, Boolean> depthOneEntry : depthOneReachableSections.entrySet()) {
+              String depthOne = depthOneEntry.getKey();
+              newReachable.put(depthOne, Boolean.TRUE);
+            }
+          } else {
+            throw new OdkXlsValidationException(
+                "Cannot convert section " + sectionName + ". Section may be blank or missing.");
+          }
+
+        }
+        section.put(REACHABLE_SECTIONS.getText(), newReachable);
+        _Dumper._dump_section(newSectionName + "_newReachable_1817", newReachable);
+      }
+    }
 
 
+    findCyclesAndCheckInitial(newSections);
+    cleanupValidationTagMap(newSections);
+      
     return newSections;
   }
-
+  
   private Map<String, Object> parseSection(String sheetName, List<Map<String, Object>> sheet,
       Map<String, Map<String, Object>> settings, Map<String, String> columnTypeMap) {
     for (int i = 0; i < sheet.size(); i++) {
       ValidationUtils.sanityCheckFieldTypes();
     }
 
+    _Dumper._dump_section(sheetName + "_sheet_1676", sheet);
+
     List<Map<String, Object>> flow = parseControlFlowSection(sheetName, sheet);
+    _Dumper._dump_section(sheetName + "_flow_1682", flow);
 
     List<Map<String, Object>> blockFlow = parseTopLevelBlock(sheetName, flow);
-    /*
-     * flattenBlocks(String sheetName, List<Map<String, Object>> prompts, Map<String, List<Integer>>
-     * validationTagMap, List<Map<String, Object>> flattened, List<Map<String, Object>> blockFlow,
-     * int idx, Map<String, Map<String, Object>> specSettings)
-     */
+    _Dumper._dump_section(sheetName + "_blockflow_1690", blockFlow);
 
-    Map<String, List<Integer>> validationTagMap = new HashMap<String, List<Integer>>();
-    validationTagMap.put(_FINALIZE, new ArrayList<Integer>());
+
+    Map<String, List<Integer>> validationTagMap = new LinkedHashMap<String, List<Integer>>();
+    validationTagMap.put(_FINALIZE.getText(), new ArrayList<Integer>());
+
     List<Map<String, Object>> prompts = new ArrayList<Map<String, Object>>();
 
     List<Map<String, Object>> flattened = new ArrayList<Map<String, Object>>();
-
     flattenBlocks(sheetName, prompts, validationTagMap, flattened, blockFlow, 0, settings);
+
+    _Dumper._dump_section(sheetName + "_flattened_1710", flattened);
+    _Dumper._dump_section(sheetName + "_prompts_1712", prompts);
+    _Dumper._dump_section(sheetName + "_validationTagMap_1714", validationTagMap);
+
 
     Map<String, Integer> branchLabelMap = new LinkedHashMap<String, Integer>();
     List<Map<String, Object>> operations = new ArrayList<Map<String, Object>>();
     extractBranchLabels(sheetName, operations, branchLabelMap, flattened, 0);
+    _Dumper._dump_section(sheetName + "_extractBranchLabels_1738", branchLabelMap);
     verifyReachableLabels(sheetName, operations, branchLabelMap, 0, false);
+    _Dumper._dump_section(sheetName + "_verifyReachableBranchLabels_1748", branchLabelMap);
 
     Map<String, Boolean> nestedSections = new LinkedHashMap<String, Boolean>();
 
     gatherNestedSections(sheetName, operations, nestedSections, 0);
+    _Dumper._dump_section(sheetName + "_nestedSections_1759", nestedSections);
+
 
     Map<String, Boolean> reachableSections = new LinkedHashMap<String, Boolean>();
     reachableSections.putAll(nestedSections);
 
     Map<String, Object> parsedSection = new LinkedHashMap<String, Object>();
-    parsedSection.put("section_name", sheetName);
-    parsedSection.put("nested_sections", nestedSections);
-    parsedSection.put("reachable_sections", reachableSections);
-    parsedSection.put("prompts", prompts);
-    parsedSection.put("validation_tag_map", validationTagMap);
-    parsedSection.put("operations", operations);
-    parsedSection.put("branch_label_map", branchLabelMap);
+    parsedSection.put(SECTION_NAME.getText(), sheetName);
+    parsedSection.put(NESTED_SECTIONS.getText(), nestedSections);
+    parsedSection.put(REACHABLE_SECTIONS.getText(), reachableSections);
+    parsedSection.put(PROMPTS.getText(), prompts);
+    parsedSection.put(VALIDATION_TAG_MAP.getText(), validationTagMap);
+    parsedSection.put(OPERATIONS.getText(), operations);
+    parsedSection.put(BRANCH_LABEL_MAP.getText(), branchLabelMap);
 
     return parsedSection;
   }
 
+
+  private static void findCyclesAndCheckInitial(Map<String, Map<String, Object>> newSections) {
+    for (Entry<String, Map<String, Object>> sectionEntry : newSections.entrySet()) {
+      Map<String, Object> section = sectionEntry.getValue();
+      String sectionName = sectionEntry.getKey();
+      Map<String, Boolean> nestedSections = (Map<String, Boolean>) section.get(NESTED_SECTIONS.getText());
+      Map<String, Boolean> reachableSections =
+          (Map<String, Boolean>) section.get(REACHABLE_SECTIONS.getText());
+
+      if (nestedSections.get(INITIAL.getSheetName()) != null) {
+        throw new OdkXlsValidationException("Section '" + sectionName
+            + "' improperly references the top-level section 'initial' in a 'do section' statement");
+      }
+      if (reachableSections.get(sectionName) != null) {
+        throw new OdkXlsValidationException("Section '" + sectionName
+            + "' participates in a nested series of 'do section' statements that may call back into '"
+            + sectionName + "'!");
+      }
+    }
+  }
+  
+  private static void cleanupValidationTagMap(Map<String, Map<String, Object>> newSections) {
+    Map<String, Boolean> keys = new LinkedHashMap<String, Boolean>();
+    for (Entry<String, Map<String, Object>> sectionEntry : newSections.entrySet()) {
+      Map<String, Object> section = sectionEntry.getValue();
+      Map<String, List<Integer>> validationTagMap =
+          (Map<String, List<Integer>>) section.get(VALIDATION_TAG_MAP.getText());
+      for (Entry<String, List<Integer>> validationMapEntry : validationTagMap.entrySet()) {
+        keys.put(validationMapEntry.getKey(), Boolean.TRUE);
+      }
+    }
+
+    int keyLength = keys.size();
+    if (keys.size() == 1 && (keys.get(_FINALIZE.getText()) != null)) {
+      // not using validation tags -- rename _finalize to finalize.
+      for (Entry<String, Map<String, Object>> sectionEntry : newSections.entrySet()) {
+        Map<String, Object> section = sectionEntry.getValue();
+        Map<String, List<Integer>> validationTagMap =
+            (Map<String, List<Integer>>) section.get(VALIDATION_TAG_MAP.getText());
+        validationTagMap.put(FINALIZE, validationTagMap.get(_FINALIZE.getText()));
+        validationTagMap.remove(_FINALIZE.getText());
+      } 
+    } else {
+      // remove the _finalize validation tag -- explicit tags are being used.
+      for (Entry<String, Map<String, Object>> sectionEntry : newSections.entrySet()) {
+        Map<String, Object> section = sectionEntry.getValue();
+        String sectionName = sectionEntry.getKey();
+        Map<String, List<Integer>> validationTagMap =
+            (Map<String, List<Integer>>) section.get(VALIDATION_TAG_MAP.getText());
+        validationTagMap.remove(_FINALIZE.getText());
+      } 
+    }
+  }
+
+  
   /**
    * Verify that all goto_label constructs have a reachable branch label.
    */
@@ -152,10 +256,10 @@ public class SectionParser {
     int i = idx;
     while (i < operations.size()) {
       Map<String, Object> clause = operations.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
       switch (tokenType) {
         case GOTO_LABEL:
-          if (branchLabelMap.get((String) clause.get(_BRANCH_LABEL)) == null) {
+          if (branchLabelMap.get((String) clause.get(_BRANCH_LABEL.getText())) == null) {
             if (inscreen) {
               throw new OdkXlsValidationException(
                   "Branch label is not defined or not reachable. Labels defined outside a screen cannot be referenced from within a screen. Clause: '"
@@ -204,10 +308,10 @@ public class SectionParser {
     int i = idx;
     while (i < operations.size()) {
       Map<String, Object> clause = operations.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
       switch (tokenType) {
         case DO_SECTION:
-          nestedSections.put((String) clause.get(_DO_SECTION_NAME), Boolean.TRUE);
+          nestedSections.put((String) clause.get(_DO_SECTION_NAME.getText()), Boolean.TRUE);
           ++i;
           break;
         case ASSIGN:
@@ -242,10 +346,10 @@ public class SectionParser {
     int i = idx;
     while (i < flattened.size()) {
       Map<String, Object> clause = flattened.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
       switch (tokenType) {
         case BRANCH_LABEL:
-          branchLabelMap.put((String) clause.get(BRANCH_LABEL), operations.size());
+          branchLabelMap.put((String) clause.get(BRANCH_LABEL.getText()), operations.size());
           ++i;
           break;
         case ASSIGN:
@@ -280,9 +384,9 @@ public class SectionParser {
       List<Map<String, Object>> sheet) {
     List<Map<String, Object>> flow = new ArrayList<Map<String, Object>>();
     for (Map<String, Object> row : sheet) {
-      if (exists(row, BRANCH_LABEL)) {
+      if (exists(row, BRANCH_LABEL.getText())) {
         Map<String, Object> labelEntry = new LinkedHashMap<String, Object>();
-        labelEntry.put(_TOKEN_TYPE, BRANCH_LABEL.getText());
+        labelEntry.put(_TOKEN_TYPE.getText(), BRANCH_LABEL.getText());
         labelEntry.put(BRANCH_LABEL.getText(), row.get(BRANCH_LABEL.getText()));
         labelEntry.put(ROW_NUM_KEY, row.get(ROW_NUM_KEY));
         flow.add(labelEntry);
@@ -292,7 +396,7 @@ public class SectionParser {
         Map<String, Object> clauseEntry = new LinkedHashMap<String, Object>();
         clauseEntry.putAll(row);
         clauseEntry.remove(BRANCH_LABEL.getText());
-        clauseEntry.put(_TOKEN_TYPE, CLAUSE);
+        clauseEntry.put(_TOKEN_TYPE.getText(), CLAUSE);
         String[] parts = parseClause((String) clauseEntry.get(CLAUSE), sheetName,
             getInteger(clauseEntry, ROW_NUM_KEY));
         String first = parts[0];
@@ -303,7 +407,7 @@ public class SectionParser {
           }
         }
 
-        if (exists(row, TYPE) && !COMMENT.equals(first)) {
+        if (exists(row, TYPE.getText()) && !COMMENT.equals(first)) {
           throw new OdkXlsValidationException(
               "Exactly one of 'clause' and 'type' may be defined on any given row. Error on sheet: "
                   + sheetName + " on row: " + row.get(ROW_NUM_KEY));
@@ -336,10 +440,10 @@ public class SectionParser {
                   "'condition' expressions are not allowed on 'begin screen' clauses. Error on sheet: "
                       + sheetName + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, BEGIN_SCREEN.getText());
+            clauseEntry.put(_TOKEN_TYPE.getText(), BEGIN_SCREEN.getText());
 
             if (parts.length == 4) {
-              clauseEntry.put(_TAG_NAME, parts[3]);
+              clauseEntry.put(_TAG_NAME.getText(), parts[3]);
             }
             break;
           case END:
@@ -358,9 +462,9 @@ public class SectionParser {
                   + parts[1] + "' clauses. Error on sheet: " + sheetName + " on row: "
                   + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, "end_" + parts[1]);
+            clauseEntry.put(_TOKEN_TYPE.getText(), "end_" + parts[1]);
             if (parts.length == 4) {
-              clauseEntry.put(_TAG_NAME, parts[3]);
+              clauseEntry.put(_TAG_NAME.getText(), parts[3]);
             }
             break;
           case IF:
@@ -374,9 +478,9 @@ public class SectionParser {
                   "'condition' expression is required on 'if' clauses. Error on sheet: " + sheetName
                       + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, BEGIN_IF.getText());
+            clauseEntry.put(_TOKEN_TYPE.getText(), BEGIN_IF.getText());
             if (parts.length == 3) {
-              clauseEntry.put(_TAG_NAME, parts[2]);
+              clauseEntry.put(_TAG_NAME.getText(), parts[2]);
             }
             break;
           case ELSE:
@@ -390,9 +494,9 @@ public class SectionParser {
                   "'condition' expressions are not allowed on 'else' clauses. Error on sheet: "
                       + sheetName + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, ClauseToken.ELSE.getText());
+            clauseEntry.put(_TOKEN_TYPE.getText(), ClauseToken.ELSE.getText());
             if (parts.length == 3) {
-              clauseEntry.put(_TAG_NAME, parts[2]);
+              clauseEntry.put(_TAG_NAME.getText(), parts[2]);
             }
             break;
           case GOTO:
@@ -401,8 +505,8 @@ public class SectionParser {
                   "Expected 'goto <branchlabel>' but found: " + clauseEntry.get(CLAUSE)
                       + " on sheet: " + sheetName + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, GOTO_LABEL.getText());
-            clauseEntry.put(BRANCH_LABEL.getText(), parts[1]);
+            clauseEntry.put(_TOKEN_TYPE.getText(), GOTO_LABEL.getText());
+            clauseEntry.put(_BRANCH_LABEL.getText(), parts[1]);
             break;
 
           case BACK:
@@ -416,7 +520,7 @@ public class SectionParser {
                   "'condition' expressions are not allowed on 'back' clauses. Error on sheet: "
                       + sheetName + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, BACK_IN_HISTORY.getText());
+            clauseEntry.put(_TOKEN_TYPE.getText(), BACK_IN_HISTORY.getText());
             break;
           case RESUME:
             if (parts.length != 1) {
@@ -429,10 +533,10 @@ public class SectionParser {
                   "'condition' expressions are not allowed on 'RESUME' clauses. Error on sheet: "
                       + sheetName + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, RESUME);
+            clauseEntry.put(_TOKEN_TYPE.getText(), RESUME);
             break;
           case DO:
-            if (parts.length != 3 || !SECTION.equals(parts[1])) {
+            if (parts.length != 3 || !SECTION.getText().equals(parts[1])) {
               throw new OdkXlsValidationException(
                   "Expected 'do section <sectionname>' but found: " + clauseEntry.get(CLAUSE)
                       + " on sheet: " + sheetName + " on row: " + row.get(ROW_NUM_KEY));
@@ -442,11 +546,11 @@ public class SectionParser {
                   "'condition' expressions are not allowed on 'do section' clauses. Error on sheet: "
                       + sheetName + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, DO_SECTION.getText());
-            clauseEntry.put(_DO_SECTION_NAME, parts[2]);
+            clauseEntry.put(_TOKEN_TYPE.getText(), DO_SECTION.getText());
+            clauseEntry.put(_DO_SECTION_NAME.getText(), parts[2]);
             break;
           case EXIT:
-            if (parts.length != 2 || !SECTION.equals(parts[1])) {
+            if (parts.length != 2 || !SECTION.getText().equals(parts[1])) {
               throw new OdkXlsValidationException(
                   "Expected 'exit section' but found: " + clauseEntry.get(CLAUSE) + " on sheet: "
                       + sheetName + " on row: " + row.get(ROW_NUM_KEY));
@@ -456,7 +560,7 @@ public class SectionParser {
                   "'condition' expressions are not allowed on 'exit section' clauses. Error on sheet: "
                       + sheetName + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, EXIT_SECTION.getText());
+            clauseEntry.put(_TOKEN_TYPE.getText(), EXIT_SECTION.getText());
             break;
           case VALIDATE:
             if (parts.length > 2) {
@@ -470,11 +574,11 @@ public class SectionParser {
                   "'condition' expressions are not allowed on 'validate' clauses. Error on sheet: "
                       + sheetName + " on row: " + row.get(ROW_NUM_KEY));
             }
-            clauseEntry.put(_TOKEN_TYPE, "validate");
+            clauseEntry.put(_TOKEN_TYPE.getText(), "validate");
             if (parts.length == 2) {
-              clauseEntry.put(_SWEEP_NAME, parts[1]);
+              clauseEntry.put(_SWEEP_NAME.getText(), parts[1]);
             } else {
-              clauseEntry.put(_SWEEP_NAME, FINALIZE);
+              clauseEntry.put(_SWEEP_NAME.getText(), FINALIZE);
             }
             break;
           case SAVE:
@@ -487,7 +591,7 @@ public class SectionParser {
               clauseEntry.put(CALCULATION, Boolean.FALSE);
             }
 
-            clauseEntry.put(_TOKEN_TYPE, SAVE_AND_TERMINATE.getText());
+            clauseEntry.put(_TOKEN_TYPE.getText(), SAVE_AND_TERMINATE.getText());
             break;
           case COMMENT:
             // Skip to the next clause entry
@@ -498,7 +602,7 @@ public class SectionParser {
         }
         flow.add(clauseEntry);
 
-      } else if (exists(row, TYPE)) {
+      } else if (exists(row, TYPE.getText())) {
         Map<String, Object> typeEntry = new LinkedHashMap<String, Object>();
         typeEntry.putAll(row);
         typeEntry.remove(BRANCH_LABEL.getText());
@@ -508,18 +612,18 @@ public class SectionParser {
                   + " on row: " + row.get(ROW_NUM_KEY));
         }
         String newType =
-            formatType((String) typeEntry.get(TYPE), sheetName, getInteger(typeEntry, ROW_NUM_KEY));
+            formatType((String) typeEntry.get(TYPE.getText()), sheetName, getInteger(typeEntry, ROW_NUM_KEY));
 
         String[] parts = StringUtils.split(newType, " ");
 
         String first = parts[0];
         if (ASSIGN.getText().equals(first)) {
-          typeEntry.put(_TOKEN_TYPE, ASSIGN.getText());
+          typeEntry.put(_TOKEN_TYPE.getText(), ASSIGN.getText());
           if (parts.length >= 2) {
             /* explicit type is specified */
-            typeEntry.put(_DATA_TYPE, parts[1]);
+            typeEntry.put(_DATA_TYPE.getText(), parts[1]);
           }
-          if (!exists(row, NAME)) {
+          if (!exists(row, NAME.getText())) {
             throw new OdkXlsValidationException(
                 "'assign' expressions must specify a field 'name' Error on sheet: " + sheetName
                     + " on row: " + row.get(ROW_NUM_KEY));
@@ -530,8 +634,8 @@ public class SectionParser {
                     + sheetName + " on row: " + row.get(ROW_NUM_KEY));
           }
         } else {
-          typeEntry.put(_TOKEN_TYPE, PROMPT.getText());
-          typeEntry.put(_TYPE, newType);
+          typeEntry.put(_TOKEN_TYPE.getText(), PROMPT.getText());
+          typeEntry.put(_TYPE.getText(), newType);
         }
         flow.add(typeEntry);
 
@@ -549,11 +653,11 @@ public class SectionParser {
 
     while (i < flow.size()) {
       Map<String, Object> clause = flow.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
       Map<String, Object> psi = null;
       switch (tokenType) {
         case BRANCH_LABEL:
-          if (clause.get(BRANCH_LABEL.getText()).equals(_CONTENTS)) {
+          if (clause.get(BRANCH_LABEL.getText()).equals(_CONTENTS.getText())) {
             hasContents = true;
           }
           blockFlow.add(clause);
@@ -606,7 +710,7 @@ public class SectionParser {
     if (flow.size() == 0) {
       rowNum = 2;
     } else {
-      rowNum = getInteger(flow.get(flow.size() - 1), ROW_NUM_KEY);
+      rowNum = getInteger(flow.get(flow.size() - 1), ROW_NUM_KEY) + 1;
     }
     blockFlow.add(getExitEnding(rowNum));
 
@@ -624,22 +728,23 @@ public class SectionParser {
 
   private Map<String, Object> getExitEnding(Integer rowNum) {
     Map<String, Object> exitEnding = new LinkedHashMap<String, Object>();
-    exitEnding.put(_TOKEN_TYPE, EXIT_SECTION.getText());
-    exitEnding.put(CLAUSE, EXIT_SECTION.getText());
+    exitEnding.put(_TOKEN_TYPE.getText(), EXIT_SECTION.getText());
+    exitEnding.put(CLAUSE, EXIT_SPACE_SECTION);
     exitEnding.put(ROW_NUM_KEY, rowNum);
     return exitEnding;
   }
 
   private void addContentsBranchLabel(Integer rowNum, List<Map<String, Object>> blockFlow) {
     Map<String, Object> newRow = new LinkedHashMap<String, Object>();
-    newRow.put(_TOKEN_TYPE, BRANCH_LABEL.getText());
-    newRow.put(BRANCH_LABEL.getText(), _CONTENTS);
+    newRow.put(_TOKEN_TYPE.getText(), BRANCH_LABEL.getText());
+    newRow.put(BRANCH_LABEL.getText(), _CONTENTS.getText());
     newRow.put(ROW_NUM_KEY, rowNum);
     blockFlow.add(newRow);
 
     newRow = new LinkedHashMap<String, Object>();
-    newRow.put(_TOKEN_TYPE, PROMPT.getText());
-    newRow.put(TYPE, CONTENTS);
+    newRow.put(_TOKEN_TYPE.getText(), PROMPT.getText());
+    newRow.put(TYPE.getText(), CONTENTS);
+    newRow.put(_TYPE.getText(), CONTENTS);
     newRow.put(ROW_NUM_KEY, rowNum);
     Map<String, Object> newScreen = new LinkedHashMap<String, Object>();
     newScreen.put("hideInBackHistory", Boolean.TRUE);
@@ -647,7 +752,7 @@ public class SectionParser {
     blockFlow.add(newRow);
 
     newRow = new LinkedHashMap<String, Object>();
-    newRow.put(_TOKEN_TYPE, RESUME);
+    newRow.put(_TOKEN_TYPE.getText(), RESUME);
     newRow.put(CLAUSE, RESUME);
     newRow.put(ROW_NUM_KEY, rowNum);
     blockFlow.add(newRow);
@@ -655,15 +760,15 @@ public class SectionParser {
 
   private void addInitialSheetContent(Integer rowNum, List<Map<String, Object>> blockFlow) {
     Map<String, Object> newRow = new LinkedHashMap<String, Object>();
-    newRow.put(_TOKEN_TYPE, BRANCH_LABEL.getText());
-    newRow.put(BRANCH_LABEL.getText(), _FINALIZE);
+    newRow.put(_TOKEN_TYPE.getText(), BRANCH_LABEL.getText());
+    newRow.put(BRANCH_LABEL.getText(), _FINALIZE.getText());
     newRow.put(ROW_NUM_KEY, rowNum);
     blockFlow.add(newRow);
 
     newRow = new LinkedHashMap<String, Object>();
-    newRow.put(_TOKEN_TYPE, ClauseToken.VALIDATE.getText());
+    newRow.put(_TOKEN_TYPE.getText(), ClauseToken.VALIDATE.getText());
     newRow.put(CLAUSE, ClauseToken.VALIDATE.getText() + " " + FINALIZE);
-    newRow.put(_SWEEP_NAME, FINALIZE);
+    newRow.put(_SWEEP_NAME.getText(), FINALIZE);
     newRow.put(ROW_NUM_KEY, rowNum);
     Map<String, Object> newScreen = new LinkedHashMap<String, Object>();
     newScreen.put("hideInBackHistory", Boolean.TRUE);
@@ -671,7 +776,7 @@ public class SectionParser {
     blockFlow.add(newRow);
 
     newRow = new LinkedHashMap<String, Object>();
-    newRow.put(_TOKEN_TYPE, SAVE_AND_TERMINATE.getText());
+    newRow.put(_TOKEN_TYPE.getText(), SAVE_AND_TERMINATE.getText());
     newRow.put(CLAUSE, SAVE + " " + AND + " " + TERMINATE);
     newRow.put(CALCULATION, Boolean.TRUE);
     newRow.put(ROW_NUM_KEY, rowNum);
@@ -681,7 +786,7 @@ public class SectionParser {
     blockFlow.add(newRow);
 
     newRow = new LinkedHashMap<String, Object>();
-    newRow.put(_TOKEN_TYPE, RESUME);
+    newRow.put(_TOKEN_TYPE.getText(), RESUME);
     newRow.put(CLAUSE, RESUME);
     newRow.put(ROW_NUM_KEY, rowNum);
     blockFlow.add(newRow);
@@ -690,13 +795,13 @@ public class SectionParser {
   private Map<String, Object> parseTopLevelIfBlock(String sheetName, List<Map<String, Object>> flow,
       int idx) {
     int i = idx + 1;
-    String tag = (String) flow.get(idx).get(_TAG_NAME);
-    boolean thenFlow = false;
+    String tag = (String) flow.get(idx).get(_TAG_NAME.getText());
+    boolean thenFlow = true;
     List<Map<String, Object>> blockFlow = new ArrayList<Map<String, Object>>();
     while (i < flow.size()) {
 
       Map<String, Object> clause = flow.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
       Map<String, Object> psi = null;
       String endTag = null;
       switch (tokenType) {
@@ -731,7 +836,7 @@ public class SectionParser {
 
           break;
         case ELSE:
-          endTag = (String) flow.get(i).get(_TAG_NAME);
+          endTag = (String) flow.get(i).get(_TAG_NAME.getText());
           if (!StringUtils.equals(tag, endTag)) {
             logger.warn("Interesting: tag: " + tag + " endTag " + endTag + " rowNum "
                 + flow.get(i).get(ROW_NUM_KEY) + " sheetName " + sheetName);
@@ -747,26 +852,26 @@ public class SectionParser {
                     + flow.get(i).get(ROW_NUM_KEY) + " for '" + flow.get(idx).get(CLAUSE)
                     + "' at row " + flow.get(idx).get(ROW_NUM_KEY) + " on sheet: " + sheetName);
           }
-          flow.get(idx).put(_ELSE_CLAUSE, clause);
-          flow.get(idx).put(_THEN_BLOCK, blockFlow);
+          flow.get(idx).put(_ELSE_CLAUSE.getText(), clause);
+          flow.get(idx).put(_THEN_BLOCK.getText(), blockFlow);
           blockFlow = new ArrayList<Map<String, Object>>();
           thenFlow = false;
           ++i;
           break;
         case END_IF:
-          endTag = (String) flow.get(i).get(_TAG_NAME);
+          endTag = (String) flow.get(i).get(_TAG_NAME.getText());
           if (!StringUtils.equals(tag, endTag)) {
             throw new OdkXlsValidationException("Mismatched tag on '" + flow.get(i).get(CLAUSE)
                 + "' at row " + flow.get(i).get(ROW_NUM_KEY) + ". Should match tag on '"
                 + flow.get(idx).get(CLAUSE) + "' at row " + flow.get(idx).get(ROW_NUM_KEY)
                 + " on sheet: " + sheetName);
           }
-          flow.get(idx).put(_END_IF_CLAUSE, clause);
+          flow.get(idx).put(_END_IF_CLAUSE.getText(), clause);
 
           if (thenFlow) {
-            flow.get(idx).put(_THEN_BLOCK, blockFlow);
+            flow.get(idx).put(_THEN_BLOCK.getText(), blockFlow);
           } else {
-            flow.get(idx).put(_ELSE_BLOCK, blockFlow);
+            flow.get(idx).put(_ELSE_BLOCK.getText(), blockFlow);
 
           }
           return getIdxReturnValue(flow.get(idx), i + 1);
@@ -790,10 +895,10 @@ public class SectionParser {
       int idx) {
     List<Map<String, Object>> blockFlow = new ArrayList<Map<String, Object>>();
     int i = idx + 1;
-    String tag = (String) flow.get(idx).get(_TAG_NAME);
+    String tag = (String) flow.get(idx).get(_TAG_NAME.getText());
     while (i < flow.size()) {
       Map<String, Object> clause = flow.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
       switch (tokenType) {
         case ASSIGN:
         case PROMPT:
@@ -828,15 +933,15 @@ public class SectionParser {
           i = getInteger(psi, "idx");
           break;
         case END_SCREEN:
-          String endTag = (String) flow.get(i).get(_TAG_NAME);
+          String endTag = (String) flow.get(i).get(_TAG_NAME.getText());
           if (!StringUtils.equals(tag, endTag)) {
             throw new OdkXlsValidationException("Mismatched tag on '" + flow.get(i).get(CLAUSE)
                 + "' at row " + flow.get(i).get(ROW_NUM_KEY) + ". Should match tag on '"
                 + flow.get(idx).get(CLAUSE) + "' at row " + flow.get(idx).get(ROW_NUM_KEY)
                 + " on sheet: " + sheetName);
           }
-          flow.get(idx).put(_END_SCREEN_CLAUSE, clause);
-          flow.get(idx).put(_SCREEN_BLOCK, blockFlow);
+          flow.get(idx).put(_END_SCREEN_CLAUSE.getText(), clause);
+          flow.get(idx).put(_SCREEN_BLOCK.getText(), blockFlow);
 
           return getIdxReturnValue(flow.get(idx), i + 1);
         default:
@@ -858,13 +963,13 @@ public class SectionParser {
   private Map<String, Object> parseScreenIfBlock(String sheetName, List<Map<String, Object>> flow,
       int idx) {
     int i = idx + 1;
-    String tag = (String) flow.get(idx).get(_TAG_NAME);
-    boolean thenFlow = false;
+    String tag = (String) flow.get(idx).get(_TAG_NAME.getText());
+    boolean thenFlow = true;
     List<Map<String, Object>> blockFlow = new ArrayList<Map<String, Object>>();
 
     while (i < flow.size()) {
       Map<String, Object> clause = flow.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
 
       switch (tokenType) {
         case ASSIGN:
@@ -892,7 +997,7 @@ public class SectionParser {
           i = getInteger(psi, "idx");
           break;
         case ELSE:
-          String endTag = (String) flow.get(i).get(_TAG_NAME);
+          String endTag = (String) flow.get(i).get(_TAG_NAME.getText());
           if (!StringUtils.equals(tag, endTag)) {
             throw new OdkXlsValidationException("Mismatched tag on '" + flow.get(i).get(CLAUSE)
                 + "' at row " + flow.get(i).get(ROW_NUM_KEY) + ". Should match tag on '"
@@ -905,26 +1010,26 @@ public class SectionParser {
                     + flow.get(i).get(ROW_NUM_KEY) + " for '" + flow.get(idx).get(CLAUSE)
                     + "' at row " + flow.get(idx).get(ROW_NUM_KEY) + " on sheet: " + sheetName);
           }
-          flow.get(idx).put(_ELSE_CLAUSE, clause);
-          flow.get(idx).put(_THEN_BLOCK, blockFlow);
+          flow.get(idx).put(_ELSE_CLAUSE.getText(), clause);
+          flow.get(idx).put(_THEN_BLOCK.getText(), blockFlow);
           blockFlow = new ArrayList<Map<String, Object>>();
           thenFlow = false;
           ++i;
           break;
         case END_IF:
-          endTag = (String) flow.get(i).get(_TAG_NAME);
+          endTag = (String) flow.get(i).get(_TAG_NAME.getText());
           if (!StringUtils.equals(tag, endTag)) {
             throw new OdkXlsValidationException("Mismatched tag on '" + flow.get(i).get(CLAUSE)
                 + "' at row " + flow.get(i).get(ROW_NUM_KEY) + ". Should match tag on '"
                 + flow.get(idx).get(CLAUSE) + "' at row " + flow.get(idx).get(ROW_NUM_KEY)
                 + " on sheet: " + sheetName);
           }
-          flow.get(idx).put(_END_IF_CLAUSE, clause);
+          flow.get(idx).put(_END_IF_CLAUSE.getText(), clause);
 
           if (thenFlow) {
-            flow.get(idx).put(_THEN_BLOCK, blockFlow);
+            flow.get(idx).put(_THEN_BLOCK.getText(), blockFlow);
           } else {
-            flow.get(idx).put(_ELSE_CLAUSE, blockFlow);
+            flow.get(idx).put(_ELSE_CLAUSE.getText(), blockFlow);
           }
           return getIdxReturnValue(flow.get(idx), i + 1);
         default:
@@ -955,7 +1060,7 @@ public class SectionParser {
     int i = idx;
     while (blockFlow != null && i < blockFlow.size()) {
       Map<String, Object> clause = blockFlow.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
 
       switch (tokenType) {
         case ASSIGN:
@@ -968,7 +1073,7 @@ public class SectionParser {
           break;
         case PROMPT:
           int promptIdx = prompts.size();
-          clause.put(_BRANCH_LABEL_ENCLOSING_SCREEN, sheetName + '/' + enclosingScreenLabel);
+          clause.put(_BRANCH_LABEL_ENCLOSING_SCREEN.getText(), sheetName + '/' + enclosingScreenLabel);
           clause.put(PROMPT_IDX, promptIdx);
           prompts.add(clause);
           updateValidationTagMap(validationTagMap, promptIdx, clause);
@@ -982,8 +1087,8 @@ public class SectionParser {
           ++i;
           break;
         case BEGIN_IF:
-          List<Map<String, Object>> thenBlock = (List<Map<String, Object>>) clause.get(_THEN_BLOCK);
-          List<Map<String, Object>> elseBlock = (List<Map<String, Object>>) clause.get(_ELSE_BLOCK);
+          List<Map<String, Object>> thenBlock = (List<Map<String, Object>>) clause.get(_THEN_BLOCK.getText());
+          List<Map<String, Object>> elseBlock = (List<Map<String, Object>>) clause.get(_ELSE_BLOCK.getText());
 
           defn += "if (" + clause.get(CONDITION) + ") {\n";
           defn += constructScreenDefn(sheetName, prompts, validationTagMap, thenBlock, 0,
@@ -1028,7 +1133,7 @@ public class SectionParser {
     int i = idx;
     while (i < blockFlow.size()) {
       Map<String, Object> clause = blockFlow.get(i);
-      TopLevelBlockToken tokenType = safeGetTopLevelToken(clause, sheetName);
+      TopLevelBlockToken tokenType = safeGetTokenType(clause, sheetName);
       String newScreenLabel = null;
       Map<String, Object> labelEntry = null;
       String defn = null;
@@ -1052,13 +1157,14 @@ public class SectionParser {
           // prompt of that section.
           Map<String, Object> pseudoPrompt = new LinkedHashMap<String, Object>();
           pseudoPrompt.putAll(clause);
-          pseudoPrompt.put(_TOKEN_TYPE, PROMPT.getText());
-          pseudoPrompt.put(_TYPE, _SECTION);
+          pseudoPrompt.put(_TOKEN_TYPE.getText(), PROMPT.getText());
+          pseudoPrompt.put(_TYPE.getText(), _SECTION.getText());
           pseudoPrompt.put(PROMPT_IDX, prompts.size());
-          pseudoPrompt.put(DISPLAY, specSettings.get(clause.get(_DO_SECTION_NAME)).get(DISPLAY));
-          // TODO: Transform branch label with Gson?
-          pseudoPrompt.put(_BRANCH_LABEL_ENCLOSING_SCREEN, clause.get(_DO_SECTION_NAME).toString());
+          pseudoPrompt.put(DISPLAY, specSettings.get(clause.get(_DO_SECTION_NAME.getText())).get(DISPLAY));
 
+          // TODO: Transform branch label with Gson?
+          pseudoPrompt.put(_BRANCH_LABEL_ENCLOSING_SCREEN.getText(),
+              clause.get(_DO_SECTION_NAME.getText()).toString() + "/0");
 
           prompts.add(pseudoPrompt);
           flattened.add(clause);
@@ -1068,29 +1174,28 @@ public class SectionParser {
           newScreenLabel = "_screen" + clause.get(ROW_NUM_KEY);
 
           labelEntry = new LinkedHashMap<String, Object>();
-          labelEntry.put(_TOKEN_TYPE, BRANCH_LABEL.getText());
+          labelEntry.put(_TOKEN_TYPE.getText(), BRANCH_LABEL.getText());
           labelEntry.put(BRANCH_LABEL.getText(), newScreenLabel);
           labelEntry.put(ROW_NUM_KEY, clause.get(ROW_NUM_KEY));
-
-
           flattened.add(labelEntry);
+
           // inform the prompt of the tag for the enclosing screen...
           int promptIdx = prompts.size();
-          clause.put(_BRANCH_LABEL_ENCLOSING_SCREEN, sheetName + '/' + newScreenLabel);
+          clause.put(_BRANCH_LABEL_ENCLOSING_SCREEN.getText(), sheetName + '/' + newScreenLabel);
           clause.put(PROMPT_IDX, promptIdx);
           prompts.add(clause);
+
           updateValidationTagMap(validationTagMap, promptIdx, clause);
 
-          defn = "activePromptIndicies.add(" + promptIdx + ");\n";
+          defn = "activePromptIndicies.push(" + promptIdx + ");\n";
           defn = "function() {var activePromptIndicies = [];\n" + defn
               + "\nreturn activePromptIndicies;\n}\n";
-
 
           Map<String, Object> bsb = new LinkedHashMap<String, Object>();
           bsb.put(CLAUSE, clause.get(CLAUSE));
           bsb.put(ROW_NUM_KEY, clause.get(ROW_NUM_KEY));
-          bsb.put(_TOKEN_TYPE, BEGIN_SCREEN.getText());
-          bsb.put(_SCREEN_BLOCK, defn);
+          bsb.put(_TOKEN_TYPE.getText(), BEGIN_SCREEN.getText());
+          bsb.put(_SCREEN_BLOCK.getText(), defn);
 
 
           if (clause.get(SCREEN) != null) {
@@ -1104,27 +1209,27 @@ public class SectionParser {
         case BEGIN_SCREEN:
           newScreenLabel = "_screen" + clause.get(ROW_NUM_KEY);
           labelEntry = new LinkedHashMap<String, Object>();
-          labelEntry.put(_TOKEN_TYPE, BRANCH_LABEL.getText());
+          labelEntry.put(_TOKEN_TYPE.getText(), BRANCH_LABEL.getText());
           labelEntry.put(BRANCH_LABEL.getText(), newScreenLabel);
           labelEntry.put(ROW_NUM_KEY, clause.get(ROW_NUM_KEY));
           flattened.add(labelEntry);
           // process the screen definition
           List<Map<String, Object>> screenBlock =
-              (List<Map<String, Object>>) clause.get(_SCREEN_BLOCK);
+              (List<Map<String, Object>>) clause.get(_SCREEN_BLOCK.getText());
           defn = constructScreenDefn(sheetName, prompts, validationTagMap, screenBlock, 0,
               newScreenLabel, getInteger(clause, ROW_NUM_KEY));
           defn = "function() {var activePromptIndicies = [];\n" + defn
               + "\nreturn activePromptIndicies;\n}\n";
-          clause.put(_SCREEN_BLOCK, defn);
+          clause.put(_SCREEN_BLOCK.getText(), defn);
           flattened.add(clause);
           ++i;
           break;
         case BEGIN_IF:
-          Map<String, Object> endIfClause = (Map<String, Object>) clause.get(_END_IF_CLAUSE);
-          Map<String, Object> elseClause = (clause.get(_ELSE_CLAUSE) != null)
-              ? (Map<String, Object>) clause.get(_ELSE_CLAUSE) : endIfClause;
-          List<Map<String, Object>> thenBlock = (List<Map<String, Object>>) clause.get(_THEN_BLOCK);
-          List<Map<String, Object>> elseBlock = (List<Map<String, Object>>) clause.get(_ELSE_BLOCK);
+          Map<String, Object> endIfClause = (Map<String, Object>) clause.get(_END_IF_CLAUSE.getText());
+          Map<String, Object> elseClause = (clause.get(_ELSE_CLAUSE.getText()) != null)
+              ? (Map<String, Object>) clause.get(_ELSE_CLAUSE.getText()) : endIfClause;
+          List<Map<String, Object>> thenBlock = (List<Map<String, Object>>) clause.get(_THEN_BLOCK.getText());
+          List<Map<String, Object>> elseBlock = (List<Map<String, Object>>) clause.get(_ELSE_BLOCK.getText());
           String thenLabel = "_then" + clause.get(ROW_NUM_KEY);
           String endifLabel = "_endif" + endIfClause.get(ROW_NUM_KEY);
           String elseLabel = "_else" + elseClause.get(ROW_NUM_KEY);
@@ -1132,25 +1237,25 @@ public class SectionParser {
            * transform clause into a simple goto... Preserve the ordering of the then and else
            * blocks (so that prompts remain in-order)
            */
-          clause.remove(_ELSE_CLAUSE);
-          clause.remove(_END_IF_CLAUSE);
-          clause.remove(_THEN_BLOCK);
-          clause.remove(_ELSE_BLOCK);
-          clause.put(_TOKEN_TYPE, GOTO_LABEL.getText());
-          clause.put(_BRANCH_LABEL, thenLabel);
+          clause.remove(_ELSE_CLAUSE.getText());
+          clause.remove(_END_IF_CLAUSE.getText());
+          clause.remove(_THEN_BLOCK.getText());
+          clause.remove(_ELSE_BLOCK.getText());
+          clause.put(_TOKEN_TYPE.getText(), GOTO_LABEL.getText());
+          clause.put(_BRANCH_LABEL.getText(), thenLabel);
           flattened.add(clause); // goto Then conditionally
 
           Map<String, Object> goElse = new LinkedHashMap<String, Object>();
           goElse.put(CLAUSE, elseClause.get(CLAUSE));
-          goElse.put(_TOKEN_TYPE, GOTO_LABEL.getText());
-          goElse.put(BRANCH_LABEL.getText(), elseLabel);
+          goElse.put(_TOKEN_TYPE.getText(), GOTO_LABEL.getText());
+          goElse.put(_BRANCH_LABEL.getText(), elseLabel);
           goElse.put(ROW_NUM_KEY, elseClause.get(ROW_NUM_KEY));
 
           flattened.add(goElse); // goto Else unconditionally
 
 
           labelEntry = new LinkedHashMap<String, Object>();
-          labelEntry.put(_TOKEN_TYPE, BRANCH_LABEL.getText());
+          labelEntry.put(_TOKEN_TYPE.getText(), BRANCH_LABEL.getText());
           labelEntry.put(BRANCH_LABEL.getText(), thenLabel);
           labelEntry.put(ROW_NUM_KEY, clause.get(ROW_NUM_KEY));
 
@@ -1161,15 +1266,15 @@ public class SectionParser {
 
           Map<String, Object> goEndIf = new LinkedHashMap<String, Object>();
           goEndIf.put(CLAUSE, endIfClause.get(CLAUSE));
-          goEndIf.put(_TOKEN_TYPE, GOTO_LABEL.getText());
-          goEndIf.put(BRANCH_LABEL.getText(), endifLabel);
+          goEndIf.put(_TOKEN_TYPE.getText(), GOTO_LABEL.getText());
+          goEndIf.put(_BRANCH_LABEL.getText(), endifLabel);
           goEndIf.put(ROW_NUM_KEY, endIfClause.get(ROW_NUM_KEY));
 
 
           flattened.add(goEndIf); // goto EndIf unconditionally
 
           labelEntry = new LinkedHashMap<String, Object>();
-          labelEntry.put(_TOKEN_TYPE, BRANCH_LABEL.getText());
+          labelEntry.put(_TOKEN_TYPE.getText(), BRANCH_LABEL.getText());
           labelEntry.put(BRANCH_LABEL.getText(), elseLabel);
           labelEntry.put(ROW_NUM_KEY, elseClause.get(ROW_NUM_KEY));
 
@@ -1182,7 +1287,7 @@ public class SectionParser {
           }
 
           labelEntry = new LinkedHashMap<String, Object>();
-          labelEntry.put(_TOKEN_TYPE, BRANCH_LABEL.getText());
+          labelEntry.put(_TOKEN_TYPE.getText(), BRANCH_LABEL.getText());
           labelEntry.put(BRANCH_LABEL.getText(), endifLabel);
           labelEntry.put(ROW_NUM_KEY, endIfClause.get(ROW_NUM_KEY));
 
@@ -1243,17 +1348,17 @@ public class SectionParser {
     return exists(row, field.getText());
   }
 
-  private TopLevelBlockToken safeGetTopLevelToken(Map<String, Object> clause, String sheetName) {
+  private TopLevelBlockToken safeGetTokenType(Map<String, Object> clause, String sheetName) {
     TopLevelBlockToken tokenType = null;
     try {
-      tokenType = TopLevelBlockToken.fromText((String) clause.get(_TOKEN_TYPE));
+      tokenType = TopLevelBlockToken.fromText((String) clause.get(_TOKEN_TYPE.getText()));
     } catch (IllegalArgumentException e) {
       throw new OdkXlsValidationException(
-          "Unrecognized 'clause' expression: " + clause.get(_TOKEN_TYPE) + " Error on sheet: "
+          "Unrecognized 'clause' expression: " + clause.get(_TOKEN_TYPE.getText()) + " Error on sheet: "
               + sheetName + " on row: " + clause.get(ROW_NUM_KEY));
 
     } catch (NullPointerException e) {
-      throw new OdkXlsValidationException("Null 'clause' expression: " + clause.get(_TOKEN_TYPE)
+      throw new OdkXlsValidationException("Null 'clause' expression: " + clause.get(_TOKEN_TYPE.getText())
           + " Error on sheet: " + sheetName + " on row: " + clause.get(ROW_NUM_KEY));
 
     }
@@ -1276,7 +1381,7 @@ public class SectionParser {
     String[] parts = StringUtils.split(tags, " ");
     if ("".equals(tags) || parts.length == 0 || (parts.length == 1 && "".equals(parts[0]))) {
       if (exists(clause, REQUIRED) || exists(clause, CONSTRAINT)) {
-        List<Integer> finalize = (List<Integer>) validationTagMap.get(_FINALIZE);
+        List<Integer> finalize = (List<Integer>) validationTagMap.get(_FINALIZE.getText());
         finalize.add(promptIdx);
       }
     } else {
@@ -1290,5 +1395,8 @@ public class SectionParser {
       }
     }
   }
+
+
+
 
 }

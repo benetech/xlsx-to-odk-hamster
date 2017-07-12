@@ -1,0 +1,119 @@
+[
+	{
+		"_row_num": 2,
+		"clause": "if // start",
+		"condition": "(opendatakit.getCurrentInstanceId() != null)",
+		"_token_type": "begin_if",
+		"_tag_name": "start",
+		"_else_clause": {
+			"_row_num": 7,
+			"clause": "else // start",
+			"_token_type": "else",
+			"_tag_name": "start"
+		},
+		"_then_block": [
+			{
+				"_row_num": 3,
+				"type": "opening",
+				"display": {
+					"text": "Edit form"
+				},
+				"_token_type": "prompt",
+				"_type": "opening"
+			},
+			{
+				"_row_num": 4,
+				"clause": "do section survey",
+				"_token_type": "do_section",
+				"_do_section_name": "survey"
+			},
+			{
+				"_row_num": 5,
+				"type": "summary",
+				"display": {
+					"text": "Summary"
+				},
+				"_token_type": "prompt",
+				"_type": "summary"
+			},
+			{
+				"_row_num": 6,
+				"type": "finalize",
+				"display": {
+					"text": "Save form"
+				},
+				"_token_type": "prompt",
+				"_type": "finalize"
+			}
+		],
+		"_end_if_clause": {
+			"_row_num": 9,
+			"clause": "end if // start",
+			"_token_type": "end_if",
+			"_tag_name": "start"
+		},
+		"_else_block": [
+			{
+				"_row_num": 8,
+				"type": "instances",
+				"display": {
+					"text": "Saved instances"
+				},
+				"_token_type": "prompt",
+				"_type": "instances"
+			}
+		]
+	},
+	{
+		"_token_type": "exit_section",
+		"clause": "exit section",
+		"_row_num": 10
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_contents",
+		"_row_num": 10
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 10,
+		"screen": {
+			"hideInBackHistory": true
+		}
+	},
+	{
+		"_token_type": "resume",
+		"clause": "resume",
+		"_row_num": 10
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_finalize",
+		"_row_num": 10
+	},
+	{
+		"_token_type": "validate",
+		"clause": "validate finalize",
+		"_sweep_name": "finalize",
+		"_row_num": 10,
+		"screen": {
+			"hideInBackHistory": true
+		}
+	},
+	{
+		"_token_type": "save_and_terminate",
+		"clause": "save and terminate",
+		"calculation": true,
+		"_row_num": 10,
+		"screen": {
+			"hideInBackHistory": true
+		}
+	},
+	{
+		"_token_type": "resume",
+		"clause": "resume",
+		"_row_num": 10
+	}
+]

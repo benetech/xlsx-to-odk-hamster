@@ -1,0 +1,128 @@
+[
+	{
+		"comments": "begin screen and end screen are used to defined the begin and end of the screen if we want to have multiple fields on one screen.",
+		"clause": "begin screen",
+		"_row_num": 12,
+		"__rowNum__": 11,
+		"_token_type": "begin_screen"
+	},
+	{
+		"type": "integer",
+		"name": "Salary",
+		"display": {
+			"text": {
+				"default": "How much is your monthly salary?",
+				"spanish": "¿Cuánto es su salario mensual?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 13,
+		"__rowNum__": 12,
+		"_token_type": "prompt",
+		"_type": "integer"
+	},
+	{
+		"type": "select_one_dropdown",
+		"values_list": "yes_no",
+		"name": "Unpaid",
+		"display": {
+			"text": {
+				"default": "Do you have an unpaid job?",
+				"spanish": "¿Tiene una actividad económica no asalariada?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 14,
+		"__rowNum__": 13,
+		"_token_type": "prompt",
+		"_type": "select_one_dropdown"
+	},
+	{
+		"type": "integer",
+		"name": "WeeklySales",
+		"display": {
+			"text": {
+				"default": "How much do you sell weekly?",
+				"spanish": "¿Cuánto es su venta semanal?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 15,
+		"__rowNum__": 14,
+		"_token_type": "prompt",
+		"_type": "integer"
+	},
+	{
+		"type": "integer",
+		"name": "WeeklyExpenses",
+		"display": {
+			"text": {
+				"default": "How much are your weekly expenses?",
+				"spanish": "¿Cuánto es su gasto semanal?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 16,
+		"__rowNum__": 15,
+		"_token_type": "prompt",
+		"_type": "integer"
+	},
+	{
+		"type": "integer",
+		"name": "FamilySize",
+		"display": {
+			"text": {
+				"default": "How many people live in your house?",
+				"spanish": "¿Cuántas personas viven en su casa?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 17,
+		"__rowNum__": 16,
+		"_token_type": "prompt",
+		"_type": "integer"
+	},
+	{
+		"type": "integer",
+		"name": "Earners",
+		"display": {
+			"text": {
+				"default": "How many people earn money in your home?",
+				"spanish": "¿Cuántas personas ganan plata en su casa?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 18,
+		"__rowNum__": 17,
+		"_token_type": "prompt",
+		"_type": "integer"
+	},
+	{
+		"type": "integer",
+		"name": "Children",
+		"display": {
+			"text": {
+				"default": "How many people are under 18 years old in your house?",
+				"spanish": "¿Cuántas personas son menores a 18 años en su casa?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 19,
+		"__rowNum__": 18,
+		"_token_type": "prompt",
+		"_type": "integer"
+	},
+	{
+		"clause": "end screen",
+		"_row_num": 20,
+		"__rowNum__": 19,
+		"_token_type": "end_screen"
+	}
+]

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.benetech.xlsxodk.Constants;
+import org.benetech.xlsxodk.util._Dumper;
 import org.benetech.xlsxodk.validation.SpecificationValidator;
 
 /**
@@ -44,6 +45,7 @@ public class SpecificationConverter {
     Collections.sort(sectionNames);
     addSectionsToSettings();
     parseSections();
+    developDataModel();
 
   }
 
@@ -58,6 +60,13 @@ public class SpecificationConverter {
 
   }
 
+  public void developDataModel() {
+    DataModelCreator dataModelCreator = new DataModelCreator(specification, promptTypes) ;
+    dataModelCreator.create();
+    _Dumper._dump_section("developDataModel_2914", specification.get(MODEL.getSheetName()));
+
+  }
+  
   public void addColumnTypesSection() {
     // TODO: Add custom column types
     specification.put(COLUMN_TYPES.getSheetName(), Constants.COLUMN_TYPE_MAP);

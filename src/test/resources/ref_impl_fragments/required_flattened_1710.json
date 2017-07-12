@@ -1,0 +1,49 @@
+[
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_screen12",
+		"_row_num": 12
+	},
+	{
+		"comments": "begin screen and end screen are used to defined the begin and end of the screen if we want to have multiple fields on one screen.",
+		"clause": "begin screen",
+		"_row_num": 12,
+		"__rowNum__": 11,
+		"_token_type": "begin_screen",
+		"_end_screen_clause": {
+			"clause": "end screen",
+			"_row_num": 19,
+			"__rowNum__": 18,
+			"_token_type": "end_screen"
+		},
+		"_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(0);\nif (data('Area') == null) {\nactivePromptIndicies.push(1);\n}\nactivePromptIndicies.push(2);\nactivePromptIndicies.push(3);\n\nreturn activePromptIndicies;\n}\n"
+	},
+	{
+		"_token_type": "exit_section",
+		"clause": "exit section",
+		"_row_num": 20
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_contents",
+		"_row_num": 20
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_screen20",
+		"_row_num": 20
+	},
+	{
+		"_row_num": 20,
+		"_token_type": "begin_screen",
+		"_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(4);\n\nreturn activePromptIndicies;\n}\n",
+		"screen": {
+			"hideInBackHistory": true
+		}
+	},
+	{
+		"_token_type": "resume",
+		"clause": "resume",
+		"_row_num": 20
+	}
+]

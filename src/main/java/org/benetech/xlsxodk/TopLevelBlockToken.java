@@ -32,4 +32,9 @@ public enum TopLevelBlockToken {
   public static TopLevelBlockToken fromText(String text) {
     return TopLevelBlockToken.valueOf(text.toUpperCase());
   }
+  
+  @Override
+  public String toString() {
+    return text;
+  }
 }

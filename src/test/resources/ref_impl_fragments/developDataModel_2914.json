@@ -1,0 +1,181 @@
+{
+	"Area": {
+		"_defn": [
+			{
+				"_row_num": 13,
+				"section_name": "required"
+			}
+		],
+		"type": "string",
+		"valuesList": "area_type",
+		"elementKey": "Area"
+	},
+	"Principal": {
+		"_defn": [
+			{
+				"_row_num": 17,
+				"section_name": "required"
+			}
+		],
+		"type": "string",
+		"valuesList": "principal_activity",
+		"elementKey": "Principal"
+	},
+	"Secondary": {
+		"_defn": [
+			{
+				"_row_num": 18,
+				"section_name": "required"
+			}
+		],
+		"type": "string",
+		"valuesList": "secondary_activity",
+		"elementKey": "Secondary"
+	},
+	"Salary": {
+		"_defn": [
+			{
+				"_row_num": 13,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer",
+		"elementKey": "Salary"
+	},
+	"Unpaid": {
+		"_defn": [
+			{
+				"_row_num": 14,
+				"section_name": "economic"
+			}
+		],
+		"type": "string",
+		"valuesList": "yes_no",
+		"elementKey": "Unpaid"
+	},
+	"WeeklySales": {
+		"_defn": [
+			{
+				"_row_num": 15,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer",
+		"elementKey": "WeeklySales"
+	},
+	"WeeklyExpenses": {
+		"_defn": [
+			{
+				"_row_num": 16,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer",
+		"elementKey": "WeeklyExpenses"
+	},
+	"FamilySize": {
+		"_defn": [
+			{
+				"_row_num": 17,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer",
+		"elementKey": "FamilySize"
+	},
+	"Earners": {
+		"_defn": [
+			{
+				"_row_num": 18,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer",
+		"elementKey": "Earners"
+	},
+	"Children": {
+		"_defn": [
+			{
+				"_row_num": 19,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer",
+		"elementKey": "Children"
+	},
+	"picture": {
+		"_defn": [
+			{
+				"_row_num": 5,
+				"section_name": "picture"
+			}
+		],
+		"type": "object",
+		"elementType": "mimeUri",
+		"properties": {
+			"uriFragment": {
+				"type": "string",
+				"elementType": "rowpath",
+				"elementKey": "picture_uriFragment"
+			},
+			"contentType": {
+				"type": "string",
+				"elementType": "mimeType",
+				"default": "image/*",
+				"elementKey": "picture_contentType"
+			}
+		},
+		"elementKey": "picture"
+	},
+	"location": {
+		"_defn": [
+			{
+				"_row_num": 5,
+				"section_name": "location"
+			}
+		],
+		"type": "object",
+		"elementType": "geopoint",
+		"properties": {
+			"latitude": {
+				"type": "number",
+				"elementKey": "location_latitude"
+			},
+			"longitude": {
+				"type": "number",
+				"elementKey": "location_longitude"
+			},
+			"altitude": {
+				"type": "number",
+				"elementKey": "location_altitude"
+			},
+			"accuracy": {
+				"type": "number",
+				"elementKey": "location_accuracy"
+			}
+		},
+		"elementKey": "location"
+	},
+	"stable": {
+		"_defn": [
+			{
+				"_row_num": 7,
+				"section_name": "stoplight_income"
+			}
+		],
+		"type": "string",
+		"valuesList": "stable_income",
+		"elementKey": "stable"
+	},
+	"credit": {
+		"_defn": [
+			{
+				"_row_num": 19,
+				"section_name": "stoplight_income"
+			}
+		],
+		"type": "string",
+		"valuesList": "credit_values",
+		"elementKey": "credit"
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"stoplight_income": true,
+	"required": true,
+	"economic": true,
+	"location": true,
+	"picture": true
+}

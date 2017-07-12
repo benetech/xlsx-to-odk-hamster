@@ -1,0 +1,104 @@
+[
+	{
+		"comments": "This worksheet shows how to create required questions with information that they are required below field.",
+		"_row_num": 3
+	},
+	{
+		"comments": "required defines that field is required",
+		"_row_num": 4
+	},
+	{
+		"comments": "display.hint is used to dispaly small text below the field",
+		"_row_num": 5
+	},
+	{
+		"comments": "validation_tags are used to tag groups of fields that we want to validate",
+		"_row_num": 6
+	},
+	{
+		"comments": "To check if value was already entered by user we need to get value of field. To do so we use 'data('name_of_field') == null' that checks it",
+		"_row_num": 7
+	},
+	{
+		"comments": "In forms we can use css and html attribiutes. Here it is used div with \"req\" class that is defined in css file(example file in form folder). This file must always have name \"customStyles\"",
+		"_row_num": 8
+	},
+	{
+		"comments": "We can also use calcutions defined in calculates worksheet. Here is an example that show us if user is an adult yet or not.",
+		"_row_num": 9
+	},
+	{
+		"comments": "It is possible to display data that user already filled in. To do so we use {{data.x}} where x is the name of the field where data was collected",
+		"_row_num": 10
+	},
+	{
+		"comments": "begin screen and end screen are used to defined the begin and end of the screen if we want to have multiple fields on one screen.",
+		"clause": "begin screen",
+		"_row_num": 12
+	},
+	{
+		"type": "select_one_dropdown",
+		"values_list": "area_type",
+		"name": "Area",
+		"display": {
+			"text": {
+				"default": "Residential area",
+				"spanish": "Área de residencia"
+			}
+		},
+		"required": true,
+		"validation_tags": "user_info",
+		"_row_num": 13
+	},
+	{
+		"clause": "if",
+		"condition": "data('Area') == null",
+		"_row_num": 14
+	},
+	{
+		"type": "note",
+		"display": {
+			"hint": {
+				"default": "<div class=\"req\">This field is required</div>",
+				"spanish": "<div class=\"req\">Este campo es requerido</div>"
+			}
+		},
+		"_row_num": 15
+	},
+	{
+		"clause": "end if",
+		"_row_num": 16
+	},
+	{
+		"type": "select_one_dropdown",
+		"values_list": "principal_activity",
+		"name": "Principal",
+		"display": {
+			"text": {
+				"default": "What is your main economic activity?",
+				"spanish": "¿Cuál es su actividad económica principal?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 17
+	},
+	{
+		"type": "select_one_dropdown",
+		"values_list": "secondary_activity",
+		"name": "Secondary",
+		"display": {
+			"text": {
+				"default": "What is your secondary economic activity?",
+				"spanish": "¿Cuál es su actividad económica secundaria?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 18
+	},
+	{
+		"clause": "end screen",
+		"_row_num": 19
+	}
+]

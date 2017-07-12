@@ -29,4 +29,9 @@ COMMENT("comment"),
   public static ClauseToken fromText(String text) {
     return ClauseToken.valueOf(text.toUpperCase());
   }
+  
+  @Override
+  public String toString() {
+    return text;
+  }
 }

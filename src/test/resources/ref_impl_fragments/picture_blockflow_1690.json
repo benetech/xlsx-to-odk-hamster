@@ -1,0 +1,40 @@
+[
+	{
+		"type": "image",
+		"name": "picture",
+		"display": {
+			"text": {
+				"default": "Take a picture.",
+				"spanish": "Toma una foto"
+			}
+		},
+		"_row_num": 5,
+		"__rowNum__": 4,
+		"_token_type": "prompt",
+		"_type": "image"
+	},
+	{
+		"_token_type": "exit_section",
+		"clause": "exit section",
+		"_row_num": 6
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_contents",
+		"_row_num": 6
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 6,
+		"screen": {
+			"hideInBackHistory": true
+		}
+	},
+	{
+		"_token_type": "resume",
+		"clause": "resume",
+		"_row_num": 6
+	}
+]

@@ -1,0 +1,170 @@
+[
+	{
+		"comments": "This worksheet is used to show how image based multiple choice questions works.",
+		"_row_num": 3
+	},
+	{
+		"comments": "select_one_slider is an option created specially for image based questions, which allows to answer question with an image",
+		"_row_num": 4
+	},
+	{
+		"clause": "begin screen",
+		"_row_num": 6
+	},
+	{
+		"type": "select_one_slider",
+		"values_list": "stable_income",
+		"name": "stable",
+		"display": {
+			"text": {
+				"default": "Stable income",
+				"spanish": "Ingresos estables"
+			}
+		},
+		"_row_num": 7
+	},
+	{
+		"clause": "if",
+		"condition": "selected(data('stable'), 'red')",
+		"_row_num": 8
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Red selected",
+				"spanish": "Rojo seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 9
+	},
+	{
+		"clause": "end if",
+		"_row_num": 10
+	},
+	{
+		"clause": "if",
+		"condition": "selected(data('stable'), 'yellow')",
+		"_row_num": 11
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Yellow selected",
+				"spanish": "Amarillo seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 12
+	},
+	{
+		"clause": "end if",
+		"_row_num": 13
+	},
+	{
+		"clause": "if",
+		"condition": "selected(data('stable'), 'green')",
+		"_row_num": 14
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Green selected",
+				"spanish": "Verde seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 15
+	},
+	{
+		"clause": "end if",
+		"_row_num": 16
+	},
+	{
+		"clause": "end screen",
+		"_row_num": 17
+	},
+	{
+		"clause": "begin screen",
+		"_row_num": 18
+	},
+	{
+		"type": "select_one_slider",
+		"values_list": "credit_values",
+		"name": "credit",
+		"display": {
+			"text": {
+				"default": "Credit",
+				"spanish": "Crédito"
+			}
+		},
+		"_row_num": 19
+	},
+	{
+		"clause": "if",
+		"condition": "selected(data('credit'), 'red')",
+		"_row_num": 20
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Red selected",
+				"spanish": "Rojo seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 21
+	},
+	{
+		"clause": "end if",
+		"_row_num": 22
+	},
+	{
+		"clause": "if",
+		"condition": "selected(data('credit'), 'yellow')",
+		"_row_num": 23
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Yellow selected",
+				"spanish": "Amarillo seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 24
+	},
+	{
+		"clause": "end if",
+		"_row_num": 25
+	},
+	{
+		"clause": "if",
+		"condition": "selected(data('credit'), 'green')",
+		"_row_num": 26
+	},
+	{
+		"type": "note",
+		"display": {
+			"text": {
+				"default": "Green selected",
+				"spanish": "Verde seleccionado"
+			}
+		},
+		"hideInContents": 1,
+		"_row_num": 27
+	},
+	{
+		"clause": "end if",
+		"_row_num": 28
+	},
+	{
+		"clause": "end screen",
+		"_row_num": 29
+	}
+]

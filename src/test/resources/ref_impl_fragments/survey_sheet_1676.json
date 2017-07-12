@@ -1,0 +1,128 @@
+[
+	{
+		"comments": "This is the main survey worksheet that is core of the form.",
+		"_row_num": 3
+	},
+	{
+		"comments": "For better view of the form in the app we can devide it into sections. Each section is represented by different worksheet. Here are presented fiew of them.",
+		"_row_num": 4
+	},
+	{
+		"comments": "branch_label is used to identify which part of the survey to branch to. In this example it ensures proper menu of choosing sections.",
+		"_row_num": 5
+	},
+	{
+		"comments": "clause is used in conjunction with the condition column to manage the control flow of the survey. There is a better example in name worksheet.",
+		"_row_num": 6
+	},
+	{
+		"comments": "type is the type of the field e.g. text or integer",
+		"_row_num": 7
+	},
+	{
+		"comments": "display.text is text that will be displayed on the screen. We can define other languages in settings tab and use it after dot as it is here - \"display.text.spanish\"",
+		"_row_num": 8
+	},
+	{
+		"comments": "values_list is the name of query or choice that are defined in proper tabs",
+		"_row_num": 9
+	},
+	{
+		"branch_label": "welcome_screen",
+		"_row_num": 11
+	},
+	{
+		"type": "user_branch",
+		"values_list": "which_section",
+		"display": {
+			"text": {
+				"default": "Choose a survey to fill out",
+				"spanish": "Elija una encuesta para rellenar"
+			}
+		},
+		"_row_num": 12
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 13
+	},
+	{
+		"branch_label": "stoplight_income_form",
+		"_row_num": 14
+	},
+	{
+		"comments": "To go to section we use command \"do section\" + name of section",
+		"clause": "do section stoplight_income",
+		"_row_num": 15
+	},
+	{
+		"comments": "\"go to\" command is used to go back to menu screen",
+		"clause": "goto welcome_screen",
+		"_row_num": 16
+	},
+	{
+		"branch_label": "required_form",
+		"_row_num": 17
+	},
+	{
+		"clause": "do section required",
+		"_row_num": 18
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 19
+	},
+	{
+		"branch_label": "economic_form",
+		"_row_num": 20
+	},
+	{
+		"clause": "do section economic",
+		"_row_num": 21
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 22
+	},
+	{
+		"branch_label": "location_form",
+		"_row_num": 23
+	},
+	{
+		"clause": "do section location",
+		"_row_num": 24
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 25
+	},
+	{
+		"branch_label": "picture_form",
+		"_row_num": 26
+	},
+	{
+		"clause": "do section picture",
+		"_row_num": 27
+	},
+	{
+		"clause": "goto welcome_screen",
+		"_row_num": 28
+	},
+	{
+		"branch_label": "exitpath",
+		"_row_num": 29
+	},
+	{
+		"clause": "validate user_info",
+		"_row_num": 30
+	},
+	{
+		"comments": "This line is used to validate if user completed all the required fields in survey in case of skipping any section",
+		"clause": "exit section",
+		"_row_num": 31
+	},
+	{
+		"comments": "Exit section is used to go out of section",
+		"_row_num": 32
+	}
+]

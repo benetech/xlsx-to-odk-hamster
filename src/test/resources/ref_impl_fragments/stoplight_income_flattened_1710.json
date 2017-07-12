@@ -1,0 +1,66 @@
+[
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_screen6",
+		"_row_num": 6
+	},
+	{
+		"clause": "begin screen",
+		"_row_num": 6,
+		"__rowNum__": 5,
+		"_token_type": "begin_screen",
+		"_end_screen_clause": {
+			"clause": "end screen",
+			"_row_num": 17,
+			"__rowNum__": 16,
+			"_token_type": "end_screen"
+		},
+		"_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(0);\nif (selected(data('stable'), 'red')) {\nactivePromptIndicies.push(1);\n}\nif (selected(data('stable'), 'yellow')) {\nactivePromptIndicies.push(2);\n}\nif (selected(data('stable'), 'green')) {\nactivePromptIndicies.push(3);\n}\n\nreturn activePromptIndicies;\n}\n"
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_screen18",
+		"_row_num": 18
+	},
+	{
+		"clause": "begin screen",
+		"_row_num": 18,
+		"__rowNum__": 17,
+		"_token_type": "begin_screen",
+		"_end_screen_clause": {
+			"clause": "end screen",
+			"_row_num": 29,
+			"__rowNum__": 28,
+			"_token_type": "end_screen"
+		},
+		"_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(4);\nif (selected(data('credit'), 'red')) {\nactivePromptIndicies.push(5);\n}\nif (selected(data('credit'), 'yellow')) {\nactivePromptIndicies.push(6);\n}\nif (selected(data('credit'), 'green')) {\nactivePromptIndicies.push(7);\n}\n\nreturn activePromptIndicies;\n}\n"
+	},
+	{
+		"_token_type": "exit_section",
+		"clause": "exit section",
+		"_row_num": 30
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_contents",
+		"_row_num": 30
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_screen30",
+		"_row_num": 30
+	},
+	{
+		"_row_num": 30,
+		"_token_type": "begin_screen",
+		"_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(8);\n\nreturn activePromptIndicies;\n}\n",
+		"screen": {
+			"hideInBackHistory": true
+		}
+	},
+	{
+		"_token_type": "resume",
+		"clause": "resume",
+		"_row_num": 30
+	}
+]

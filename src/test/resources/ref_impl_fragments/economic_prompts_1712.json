@@ -1,0 +1,137 @@
+[
+	{
+		"type": "integer",
+		"name": "Salary",
+		"display": {
+			"text": {
+				"default": "How much is your monthly salary?",
+				"spanish": "¿Cuánto es su salario mensual?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 13,
+		"__rowNum__": 12,
+		"_token_type": "prompt",
+		"_type": "integer",
+		"_branch_label_enclosing_screen": "economic/_screen12",
+		"promptIdx": 0
+	},
+	{
+		"type": "select_one_dropdown",
+		"values_list": "yes_no",
+		"name": "Unpaid",
+		"display": {
+			"text": {
+				"default": "Do you have an unpaid job?",
+				"spanish": "¿Tiene una actividad económica no asalariada?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 14,
+		"__rowNum__": 13,
+		"_token_type": "prompt",
+		"_type": "select_one_dropdown",
+		"_branch_label_enclosing_screen": "economic/_screen12",
+		"promptIdx": 1
+	},
+	{
+		"type": "integer",
+		"name": "WeeklySales",
+		"display": {
+			"text": {
+				"default": "How much do you sell weekly?",
+				"spanish": "¿Cuánto es su venta semanal?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 15,
+		"__rowNum__": 14,
+		"_token_type": "prompt",
+		"_type": "integer",
+		"_branch_label_enclosing_screen": "economic/_screen12",
+		"promptIdx": 2
+	},
+	{
+		"type": "integer",
+		"name": "WeeklyExpenses",
+		"display": {
+			"text": {
+				"default": "How much are your weekly expenses?",
+				"spanish": "¿Cuánto es su gasto semanal?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 16,
+		"__rowNum__": 15,
+		"_token_type": "prompt",
+		"_type": "integer",
+		"_branch_label_enclosing_screen": "economic/_screen12",
+		"promptIdx": 3
+	},
+	{
+		"type": "integer",
+		"name": "FamilySize",
+		"display": {
+			"text": {
+				"default": "How many people live in your house?",
+				"spanish": "¿Cuántas personas viven en su casa?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 17,
+		"__rowNum__": 16,
+		"_token_type": "prompt",
+		"_type": "integer",
+		"_branch_label_enclosing_screen": "economic/_screen12",
+		"promptIdx": 4
+	},
+	{
+		"type": "integer",
+		"name": "Earners",
+		"display": {
+			"text": {
+				"default": "How many people earn money in your home?",
+				"spanish": "¿Cuántas personas ganan plata en su casa?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 18,
+		"__rowNum__": 17,
+		"_token_type": "prompt",
+		"_type": "integer",
+		"_branch_label_enclosing_screen": "economic/_screen12",
+		"promptIdx": 5
+	},
+	{
+		"type": "integer",
+		"name": "Children",
+		"display": {
+			"text": {
+				"default": "How many people are under 18 years old in your house?",
+				"spanish": "¿Cuántas personas son menores a 18 años en su casa?"
+			}
+		},
+		"required": false,
+		"validation_tags": "user_info",
+		"_row_num": 19,
+		"__rowNum__": 18,
+		"_token_type": "prompt",
+		"_type": "integer",
+		"_branch_label_enclosing_screen": "economic/_screen12",
+		"promptIdx": 6
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 21,
+		"_branch_label_enclosing_screen": "economic/_screen21",
+		"promptIdx": 7
+	}
+]

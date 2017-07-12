@@ -1,0 +1,107 @@
+[
+	{
+		"type": "user_branch",
+		"values_list": "which_section",
+		"display": {
+			"text": {
+				"default": "Choose a survey to fill out",
+				"spanish": "Elija una encuesta para rellenar"
+			}
+		},
+		"_row_num": 12,
+		"__rowNum__": 11,
+		"_token_type": "prompt",
+		"_type": "user_branch",
+		"_branch_label_enclosing_screen": "survey/_screen12",
+		"promptIdx": 0
+	},
+	{
+		"comments": "To go to section we use command \"do section\" + name of section",
+		"clause": "do section stoplight_income",
+		"_row_num": 15,
+		"__rowNum__": 14,
+		"_token_type": "prompt",
+		"_do_section_name": "stoplight_income",
+		"_type": "_section",
+		"promptIdx": 1,
+		"display": {
+			"title": {
+				"default": "Income and Employment",
+				"spanish": "Ingresos y empleo"
+			}
+		},
+		"_branch_label_enclosing_screen": "stoplight_income/0"
+	},
+	{
+		"clause": "do section required",
+		"_row_num": 18,
+		"__rowNum__": 17,
+		"_token_type": "prompt",
+		"_do_section_name": "required",
+		"_type": "_section",
+		"promptIdx": 2,
+		"display": {
+			"title": {
+				"default": "Enter your information",
+				"spanish": "Rellene su información"
+			}
+		},
+		"_branch_label_enclosing_screen": "required/0"
+	},
+	{
+		"clause": "do section economic",
+		"_row_num": 21,
+		"__rowNum__": 20,
+		"_token_type": "prompt",
+		"_do_section_name": "economic",
+		"_type": "_section",
+		"promptIdx": 3,
+		"display": {
+			"title": {
+				"default": "Economic information",
+				"spanish": "Análisis económico del encuestado"
+			}
+		},
+		"_branch_label_enclosing_screen": "economic/0"
+	},
+	{
+		"clause": "do section location",
+		"_row_num": 24,
+		"__rowNum__": 23,
+		"_token_type": "prompt",
+		"_do_section_name": "location",
+		"_type": "_section",
+		"promptIdx": 4,
+		"display": {
+			"title": {
+				"default": "Location",
+				"spanish": "Ubicación"
+			}
+		},
+		"_branch_label_enclosing_screen": "location/0"
+	},
+	{
+		"clause": "do section picture",
+		"_row_num": 27,
+		"__rowNum__": 26,
+		"_token_type": "prompt",
+		"_do_section_name": "picture",
+		"_type": "_section",
+		"promptIdx": 5,
+		"display": {
+			"title": {
+				"default": "Take a picture",
+				"spanish": "Toma un foto"
+			}
+		},
+		"_branch_label_enclosing_screen": "picture/0"
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 32,
+		"_branch_label_enclosing_screen": "survey/_screen32",
+		"promptIdx": 6
+	}
+]

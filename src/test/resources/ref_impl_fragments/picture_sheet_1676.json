@@ -1,0 +1,17 @@
+[
+	{
+		"comments": "This worksheet is used to capture image and video in survey.",
+		"_row_num": 3
+	},
+	{
+		"type": "image",
+		"name": "picture",
+		"display": {
+			"text": {
+				"default": "Take a picture.",
+				"spanish": "Toma una foto"
+			}
+		},
+		"_row_num": 5
+	}
+]

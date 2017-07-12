@@ -1,0 +1,17 @@
+[
+	{
+		"comments": "This worksheet is used to capture geolocation.",
+		"_row_num": 3
+	},
+	{
+		"type": "geopoint",
+		"name": "location",
+		"display": {
+			"text": {
+				"default": "Capture your location",
+				"spanish": "Capturar su ubicación"
+			}
+		},
+		"_row_num": 5
+	}
+]

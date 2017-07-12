@@ -1,0 +1,40 @@
+[
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_screen5",
+		"_row_num": 5
+	},
+	{
+		"_row_num": 5,
+		"_token_type": "begin_screen",
+		"_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(0);\n\nreturn activePromptIndicies;\n}\n"
+	},
+	{
+		"_token_type": "exit_section",
+		"clause": "exit section",
+		"_row_num": 6
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_contents",
+		"_row_num": 6
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_screen6",
+		"_row_num": 6
+	},
+	{
+		"_row_num": 6,
+		"_token_type": "begin_screen",
+		"_screen_block": "function() {var activePromptIndicies = [];\nactivePromptIndicies.push(1);\n\nreturn activePromptIndicies;\n}\n",
+		"screen": {
+			"hideInBackHistory": true
+		}
+	},
+	{
+		"_token_type": "resume",
+		"clause": "resume",
+		"_row_num": 6
+	}
+]

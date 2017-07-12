@@ -37,6 +37,7 @@ public class SettingsValidator {
           "The value of the 'table_id' setting_name on the settings sheet cannot be more than "
               + TABLE_NAME_LENGTH + " characters long");
     }
+    ValidationUtils.assertValidUserDefinedName("The value of the 'table_id' setting_name on the settings sheet", tableIdValue);
 
   }
 
@@ -57,6 +58,8 @@ public class SettingsValidator {
           "The value of the 'form_id' setting_name on the settings sheet cannot be more than "
               + TABLE_NAME_LENGTH + " characters long");
     }
+    
+    ValidationUtils.assertValidUserDefinedName("The value of the 'form_id' setting_name on the settings sheet", formIdValue);
   }
 
   static void checkSurveyDisplayFields(Map<String, Map<String, Object>> settingsMap) {

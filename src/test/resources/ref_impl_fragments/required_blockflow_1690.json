@@ -1,0 +1,120 @@
+[
+	{
+		"comments": "begin screen and end screen are used to defined the begin and end of the screen if we want to have multiple fields on one screen.",
+		"clause": "begin screen",
+		"_row_num": 12,
+		"__rowNum__": 11,
+		"_token_type": "begin_screen",
+		"_end_screen_clause": {
+			"clause": "end screen",
+			"_row_num": 19,
+			"__rowNum__": 18,
+			"_token_type": "end_screen"
+		},
+		"_screen_block": [
+			{
+				"type": "select_one_dropdown",
+				"values_list": "area_type",
+				"name": "Area",
+				"display": {
+					"text": {
+						"default": "Residential area",
+						"spanish": "Área de residencia"
+					}
+				},
+				"required": true,
+				"validation_tags": "user_info",
+				"_row_num": 13,
+				"__rowNum__": 12,
+				"_token_type": "prompt",
+				"_type": "select_one_dropdown"
+			},
+			{
+				"clause": "if",
+				"condition": "data('Area') == null",
+				"_row_num": 14,
+				"__rowNum__": 13,
+				"_token_type": "begin_if",
+				"_end_if_clause": {
+					"clause": "end if",
+					"_row_num": 16,
+					"__rowNum__": 15,
+					"_token_type": "end_if"
+				},
+				"_then_block": [
+					{
+						"type": "note",
+						"display": {
+							"hint": {
+								"default": "<div class=\"req\">This field is required</div>",
+								"spanish": "<div class=\"req\">Este campo es requerido</div>"
+							}
+						},
+						"_row_num": 15,
+						"__rowNum__": 14,
+						"_token_type": "prompt",
+						"_type": "note"
+					}
+				]
+			},
+			{
+				"type": "select_one_dropdown",
+				"values_list": "principal_activity",
+				"name": "Principal",
+				"display": {
+					"text": {
+						"default": "What is your main economic activity?",
+						"spanish": "¿Cuál es su actividad económica principal?"
+					}
+				},
+				"required": false,
+				"validation_tags": "user_info",
+				"_row_num": 17,
+				"__rowNum__": 16,
+				"_token_type": "prompt",
+				"_type": "select_one_dropdown"
+			},
+			{
+				"type": "select_one_dropdown",
+				"values_list": "secondary_activity",
+				"name": "Secondary",
+				"display": {
+					"text": {
+						"default": "What is your secondary economic activity?",
+						"spanish": "¿Cuál es su actividad económica secundaria?"
+					}
+				},
+				"required": false,
+				"validation_tags": "user_info",
+				"_row_num": 18,
+				"__rowNum__": 17,
+				"_token_type": "prompt",
+				"_type": "select_one_dropdown"
+			}
+		]
+	},
+	{
+		"_token_type": "exit_section",
+		"clause": "exit section",
+		"_row_num": 20
+	},
+	{
+		"_token_type": "branch_label",
+		"branch_label": "_contents",
+		"_row_num": 20
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 20,
+		"screen": {
+			"hideInBackHistory": true
+		}
+	},
+	{
+		"_token_type": "resume",
+		"clause": "resume",
+		"_row_num": 20
+	}
+]

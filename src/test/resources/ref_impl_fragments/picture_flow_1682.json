@@ -1,0 +1,16 @@
+[
+	{
+		"type": "image",
+		"name": "picture",
+		"display": {
+			"text": {
+				"default": "Take a picture.",
+				"spanish": "Toma una foto"
+			}
+		},
+		"_row_num": 5,
+		"__rowNum__": 4,
+		"_token_type": "prompt",
+		"_type": "image"
+	}
+]

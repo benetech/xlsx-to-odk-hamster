@@ -1,0 +1,26 @@
+[
+	{
+		"type": "image",
+		"name": "picture",
+		"display": {
+			"text": {
+				"default": "Take a picture.",
+				"spanish": "Toma una foto"
+			}
+		},
+		"_row_num": 5,
+		"__rowNum__": 4,
+		"_token_type": "prompt",
+		"_type": "image",
+		"_branch_label_enclosing_screen": "picture/_screen5",
+		"promptIdx": 0
+	},
+	{
+		"_token_type": "prompt",
+		"type": "contents",
+		"_type": "contents",
+		"_row_num": 6,
+		"_branch_label_enclosing_screen": "picture/_screen6",
+		"promptIdx": 1
+	}
+]

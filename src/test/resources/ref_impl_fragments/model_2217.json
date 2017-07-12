@@ -1,0 +1,161 @@
+{
+	"Area": {
+		"_defn": [
+			{
+				"_row_num": 13,
+				"section_name": "required"
+			}
+		],
+		"type": "string",
+		"valuesList": "area_type"
+	},
+	"Principal": {
+		"_defn": [
+			{
+				"_row_num": 17,
+				"section_name": "required"
+			}
+		],
+		"type": "string",
+		"valuesList": "principal_activity"
+	},
+	"Secondary": {
+		"_defn": [
+			{
+				"_row_num": 18,
+				"section_name": "required"
+			}
+		],
+		"type": "string",
+		"valuesList": "secondary_activity"
+	},
+	"Salary": {
+		"_defn": [
+			{
+				"_row_num": 13,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer"
+	},
+	"Unpaid": {
+		"_defn": [
+			{
+				"_row_num": 14,
+				"section_name": "economic"
+			}
+		],
+		"type": "string",
+		"valuesList": "yes_no"
+	},
+	"WeeklySales": {
+		"_defn": [
+			{
+				"_row_num": 15,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer"
+	},
+	"WeeklyExpenses": {
+		"_defn": [
+			{
+				"_row_num": 16,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer"
+	},
+	"FamilySize": {
+		"_defn": [
+			{
+				"_row_num": 17,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer"
+	},
+	"Earners": {
+		"_defn": [
+			{
+				"_row_num": 18,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer"
+	},
+	"Children": {
+		"_defn": [
+			{
+				"_row_num": 19,
+				"section_name": "economic"
+			}
+		],
+		"type": "integer"
+	},
+	"picture": {
+		"_defn": [
+			{
+				"_row_num": 5,
+				"section_name": "picture"
+			}
+		],
+		"type": "object",
+		"elementType": "mimeUri",
+		"properties": {
+			"uriFragment": {
+				"type": "string",
+				"elementType": "rowpath"
+			},
+			"contentType": {
+				"type": "string",
+				"elementType": "mimeType",
+				"default": "image/*"
+			}
+		}
+	},
+	"location": {
+		"_defn": [
+			{
+				"_row_num": 5,
+				"section_name": "location"
+			}
+		],
+		"type": "object",
+		"elementType": "geopoint",
+		"properties": {
+			"latitude": {
+				"type": "number"
+			},
+			"longitude": {
+				"type": "number"
+			},
+			"altitude": {
+				"type": "number"
+			},
+			"accuracy": {
+				"type": "number"
+			}
+		}
+	},
+	"stable": {
+		"_defn": [
+			{
+				"_row_num": 7,
+				"section_name": "stoplight_income"
+			}
+		],
+		"type": "string",
+		"valuesList": "stable_income"
+	},
+	"credit": {
+		"_defn": [
+			{
+				"_row_num": 19,
+				"section_name": "stoplight_income"
+			}
+		],
+		"type": "string",
+		"valuesList": "credit_values"
+	}
+}
