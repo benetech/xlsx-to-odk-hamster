@@ -5,6 +5,9 @@ package org.benetech.xlsxodk;
 public enum UnderscoreToken {
   _BRANCH_LABEL("_branch_label"),
   _BRANCH_LABEL_ENCLOSING_SCREEN("_branch_label_enclosing_screen"),
+  _COMMENT("_comment"),
+  _COMMENTS("_comments"),
+
   _CONTENTS("_contents"),
   _DATA_TYPE("_data_type"),
   _DEFN("_defn"),

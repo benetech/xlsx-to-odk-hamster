@@ -1,8 +1,12 @@
 package org.benetech.xlsxodk.conversion;
 
+import static org.benetech.xlsxodk.Token.*;
+import static org.benetech.xlsxodk.SectionToken.*;
+import static org.benetech.xlsxodk.UnderscoreToken.*;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.benetech.xlsxjson.Xlsx2JsonConverter;
 import org.benetech.xlsxodk.util.ConversionUtils;
@@ -16,7 +20,8 @@ public class ModelConverter {
   Map<String, Map<String, Object>> modelMap;
 
   public ModelConverter(List<Map<String, Object>> incomingModelRowList) {
-    this.modelRowList = ConversionUtils.omitRowsWithMissingField(incomingModelRowList, MODEL_NAME_FIELD);
+    this.modelRowList =
+        ConversionUtils.omitRowsWithMissingField(incomingModelRowList, MODEL_NAME_FIELD);
     ModelValidator.validate(modelRowList);
     this.modelMap = ConversionUtils.toMap(modelRowList, MODEL_NAME_FIELD);
     updateModelFields(this.modelMap);
@@ -25,14 +30,14 @@ public class ModelConverter {
   public Map<String, Map<String, Object>> getModelMap() {
     return modelMap;
   }
-  
+
   public static void updateModelFields(Map<String, Map<String, Object>> definitions) {
     for (String key : definitions.keySet()) {
       addDefnFieldToDefinition(definitions.get(key));
       removeIgnorableModelFieldsFromDefinition(definitions.get(key));
     }
   }
-  
+
   public static void addDefnFieldToDefinition(Map<String, Object> definition) {
     Map<String, Object> defn = new LinkedHashMap<String, Object>();
     defn.put(Xlsx2JsonConverter.ROW_NUM_KEY, definition.get(Xlsx2JsonConverter.ROW_NUM_KEY));
@@ -43,10 +48,12 @@ public class ModelConverter {
   public static void removeIgnorableModelFieldsFromDefinition(Map<String, Object> definition) {
     if (definition != null) {
       definition.remove(Xlsx2JsonConverter.ROW_NUM_KEY);
-      definition.remove("comments");
-      definition.remove("name");
+      definition.remove(COMMENT.getText());
+      definition.remove(_COMMENT.getText());
+      definition.remove(COMMENTS.getText());
+      definition.remove(_COMMENTS.getText());
+      definition.remove(NAME.getText());
       definition.remove("__rowNum__");
     }
   }
-
 }

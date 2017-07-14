@@ -1,27 +1,21 @@
 {
 	"string": {
-		"type": "string",
-		"_comment": "Database primitive"
+		"type": "string"
 	},
 	"integer": {
-		"type": "integer",
-		"_comment": "Database primitive"
+		"type": "integer"
 	},
 	"number": {
-		"type": "number",
-		"_comment": "Database primitive"
+		"type": "number"
 	},
 	"boolean": {
-		"type": "boolean",
-		"_comment": "Database primitive"
+		"type": "boolean"
 	},
 	"object": {
-		"type": "object",
-		"_comment": "Database primitive"
+		"type": "object"
 	},
 	"array": {
-		"type": "array",
-		"_comment": "Database primitive"
+		"type": "array"
 	},
 	"text": {
 		"type": "string"

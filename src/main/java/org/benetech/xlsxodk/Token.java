@@ -11,11 +11,15 @@ public enum Token {
   DISPLAY("display"),
   TITLE("title"),
   VALUES_LIST("values_list"),
+  VALUESLIST("valuesList"), // Why?  WHY?
   SECTION("section"),
   OPERATION("operation"),
   ELEMENTKEY("elementKey"),
   OBJECT("object"),
-  ARRAY("array");
+  ARRAY("array"),
+  COMMENT("comment"),
+  COMMENTS("comments");
+;
   
 
 
