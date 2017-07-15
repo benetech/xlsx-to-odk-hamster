@@ -1,13 +1,36 @@
 package org.benetech.xlsxodk.conversion;
 
-import static org.benetech.xlsxodk.Token.*;
-import static org.benetech.xlsxodk.ColumnToken.*;
-
+import static org.benetech.xlsxodk.ColumnToken._CONFLICT_TYPE;
+import static org.benetech.xlsxodk.ColumnToken._FILTER_TYPE;
+import static org.benetech.xlsxodk.ColumnToken._FILTER_VALUE;
+import static org.benetech.xlsxodk.ColumnToken._FORM_ID;
+import static org.benetech.xlsxodk.ColumnToken._ID;
+import static org.benetech.xlsxodk.ColumnToken._LOCALE;
+import static org.benetech.xlsxodk.ColumnToken._ROW_ETAG;
+import static org.benetech.xlsxodk.ColumnToken._SAVEPOINT_CREATOR;
+import static org.benetech.xlsxodk.ColumnToken._SAVEPOINT_TIMESTAMP;
+import static org.benetech.xlsxodk.ColumnToken._SAVEPOINT_TYPE;
+import static org.benetech.xlsxodk.ColumnToken._SYNC_STATE;
 import static org.benetech.xlsxodk.PredefSheet.MODEL;
+import static org.benetech.xlsxodk.Token.DATATABLEMODEL;
+import static org.benetech.xlsxodk.Token.ELEMENTKEY;
+import static org.benetech.xlsxodk.Token.ELEMENTNAME;
+import static org.benetech.xlsxodk.Token.ELEMENTPATH;
+import static org.benetech.xlsxodk.Token.ELEMENTSET;
+import static org.benetech.xlsxodk.Token.ELEMENTTYPE;
+import static org.benetech.xlsxodk.Token.FRAMEWORK;
+import static org.benetech.xlsxodk.Token.ISNOTNULLABLE;
+import static org.benetech.xlsxodk.Token.ISSESSIONVARIABLE;
+import static org.benetech.xlsxodk.Token.ITEMS;
+import static org.benetech.xlsxodk.Token.LISTCHILDELEMENTKEYS;
+import static org.benetech.xlsxodk.Token.NOTUNITOFRETENTION;
+import static org.benetech.xlsxodk.Token.PROPERTIES;
+import static org.benetech.xlsxodk.Token.TABLE_ID;
+import static org.benetech.xlsxodk.Token.TYPE;
+import static org.benetech.xlsxodk.Token.VALUE;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +104,7 @@ public class DataTableModelCreator {
     String value = (String)tableId.get(VALUE.getText());
     
     // the framework form has no metadata...
-    if (! "framework".equals(value) ) {
+    if (! FRAMEWORK.getText().equals(value) ) {
         // add in the metadata columns...
         // the only ones of these that are settable outside of the data layer are
         //    _form_id

@@ -3,6 +3,7 @@ package org.benetech.xlsxodk;
 
 
 public enum UnderscoreToken {
+  _ASPECT("_aspect"),
   _BRANCH_LABEL("_branch_label"),
   _BRANCH_LABEL_ENCLOSING_SCREEN("_branch_label_enclosing_screen"),
   _COMMENT("_comment"),
@@ -17,6 +18,8 @@ public enum UnderscoreToken {
   _END_IF_CLAUSE("_end_if_clause"),
   _END_SCREEN_CLAUSE("_end_screen_clause"),
   _FINALIZE("_finalize"),
+  _KEY("_key"),
+  _PARTITION("_partition"),
   _SCREEN_BLOCK("_screen_block"),
   _SECTION("_section"),
   _SWEEP_NAME("_sweep_name"),
@@ -24,6 +27,7 @@ public enum UnderscoreToken {
   _THEN_BLOCK("_then_block"),
   _TOKEN_TYPE("_token_type"),
   _TYPE("_type"),
+  _VALUE("_value"),
 
   ;
 

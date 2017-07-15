@@ -48,6 +48,7 @@ public class SpecificationConverter {
     developDataModel();
     SpecificationValidator.checkValuesList(specification);
     createDataTableModel();
+    addPropertiesSection(originalXlsx);
 
   }
 
@@ -160,6 +161,12 @@ public class SpecificationConverter {
   public void createDataTableModel() {
     DataTableModelCreator dataTableModelCreator = new DataTableModelCreator(specification) ;
     dataTableModelCreator.create();
+  }
+  
+  public void addPropertiesSection(Map<String, List<Map<String, Object>>> xlsx) {
+    PropertiesConverter propertiesConverter =
+        new PropertiesConverter(specification, xlsx);
+        
   }
   
   public Map<String, Object> getSpecification() {

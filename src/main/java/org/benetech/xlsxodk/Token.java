@@ -27,10 +27,27 @@ public enum Token {
   NOTUNITOFRETENTION("notUnitOfRetention"),
   OBJECT("object"),
   ARRAY("array"),
+  STRING("string"),
   COMMENT("comment"),
   COMMENTS("comments"),
   TABLE_ID("table_id"),
-  DATATABLEMODEL("dataTableModel")
+  DATATABLEMODEL("dataTableModel"),
+  FRAMEWORK("framework"),
+  PARTITION("partition"),
+  KEY("key"),
+  ASPECT("aspect"),
+  COLUMN("Column"),
+  TABLE("Table"),
+  FORMTYPE("FormType"),
+  SURVEYUTIL("SurveyUtil"),
+  DEFAULT("default"),
+  DISPLAYFORMAT("displayFormat"),
+  DISPLAYCHOICESLIST("displayChoicesList"),
+  DEFAULTVIEWTYPE("defaultViewType"),
+  DATA("data"),
+  SPREADSHEET("SPREADSHEET")
+
+
 ;
   
 
