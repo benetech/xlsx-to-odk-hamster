@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.benetech.xlsxodk.util.ConversionUtils;
 import org.junit.Test;
 
 
@@ -18,7 +19,7 @@ public class DataModelCreatorTest {
   public void testDeepClone() {
     Map<String, Object> myObject = getObject();
 
-    Object newObject = DataModelCreator.deepCopyObject(myObject);
+    Object newObject = ConversionUtils.deepCopyObject(myObject);
     logger.info(myObject);
     logger.info(newObject);
 
@@ -38,7 +39,7 @@ public class DataModelCreatorTest {
 
     logger.info(myObject);
     logger.info(anotherObject);
-    Object newObject = DataModelCreator.deepExtendObject(myObject, anotherObject);
+    Object newObject = ConversionUtils.deepExtendObject(myObject, anotherObject);
 
     logger.info(newObject);
 
@@ -48,7 +49,7 @@ public class DataModelCreatorTest {
 
     logger.info(myObject);
     logger.info(anotherObject);
-    newObject = DataModelCreator.deepExtendObject(anotherObject, myObject);
+    newObject = ConversionUtils.deepExtendObject(anotherObject, myObject);
 
     logger.info(newObject);
 

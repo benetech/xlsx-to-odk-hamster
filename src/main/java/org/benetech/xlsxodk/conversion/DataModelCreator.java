@@ -1,41 +1,51 @@
 package org.benetech.xlsxodk.conversion;
 
-import static org.benetech.xlsxodk.Token.*;
-import static org.benetech.xlsxodk.SectionToken.*;
-import static org.benetech.xlsxodk.UnderscoreToken.*;
 import static org.benetech.xlsxjson.Xlsx2JsonConverter.ROW_NUM_KEY;
-
 import static org.benetech.xlsxodk.PredefSheet.MODEL;
-import org.unitils.reflectionassert.ReflectionComparatorFactory;
-import org.unitils.reflectionassert.ReflectionComparatorMode;
-import org.unitils.reflectionassert.ReflectionComparator;
+import static org.benetech.xlsxodk.SectionToken.OPERATIONS;
+import static org.benetech.xlsxodk.SectionToken.PROMPTS;
+import static org.benetech.xlsxodk.SectionToken.SECTION_NAME;
+import static org.benetech.xlsxodk.Token.ARRAY;
+import static org.benetech.xlsxodk.Token.ASSIGN;
+import static org.benetech.xlsxodk.Token.DISPLAY;
+import static org.benetech.xlsxodk.Token.DISPLAYNAME;
+import static org.benetech.xlsxodk.Token.ELEMENTKEY;
+import static org.benetech.xlsxodk.Token.ITEMS;
+import static org.benetech.xlsxodk.Token.NAME;
+import static org.benetech.xlsxodk.Token.OBJECT;
+import static org.benetech.xlsxodk.Token.OPERATION;
+import static org.benetech.xlsxodk.Token.PROPERTIES;
+import static org.benetech.xlsxodk.Token.SECTION;
+import static org.benetech.xlsxodk.Token.SECTIONS;
+import static org.benetech.xlsxodk.Token.TITLE;
+import static org.benetech.xlsxodk.Token.TYPE;
+import static org.benetech.xlsxodk.Token.VALUESLIST;
+import static org.benetech.xlsxodk.Token.VALUES_LIST;
+import static org.benetech.xlsxodk.UnderscoreToken._DATA_TYPE;
+import static org.benetech.xlsxodk.UnderscoreToken._DEFN;
+import static org.benetech.xlsxodk.UnderscoreToken._TOKEN_TYPE;
+import static org.benetech.xlsxodk.UnderscoreToken._TYPE;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.benetech.xlsxodk.Constants;
 import org.benetech.xlsxodk.Token;
 import org.benetech.xlsxodk.exception.OdkXlsValidationException;
+import org.benetech.xlsxodk.util.ConversionUtils;
 import org.benetech.xlsxodk.util.ValidationUtils;
 import org.benetech.xlsxodk.util._Dumper;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.rits.cloning.Cloner;
+import org.unitils.reflectionassert.ReflectionComparator;
+import org.unitils.reflectionassert.ReflectionComparatorFactory;
+import org.unitils.reflectionassert.ReflectionComparatorMode;
 
 public class DataModelCreator {
 
   Log logger = LogFactory.getLog(DataModelCreator.class);
-
-  final Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
   Map<String, Object> specification;
 
@@ -43,143 +53,10 @@ public class DataModelCreator {
 
   Map<String, Map<String, Object>> modelSection;
 
-
   public DataModelCreator(Map<String, Object> specification, Map<String, Object> promptTypes) {
     this.specification = specification;
     this.promptTypes = promptTypes;
     this.modelSection = (Map<String, Map<String, Object>>) specification.get(MODEL.getSheetName());
-  }
-
-  public void processPromptSchemas(Map<String, Object> section, List<Map<String, Object>> prompts,
-      Map<String, Object> model) {
-    int i = 0;
-    Map<String, Object> schema = null;
-    for (Map<String, Object> prompt : prompts) {
-      logger.info("*** " + section.get(SECTION_NAME.getText()) + " prompts " + i);
-      logger.info(gson.toJson(prompts));
-      logger.info("*** " + section.get(SECTION_NAME.getText()) + " prompt " + i);
-      logger.info(gson.toJson(prompt));
-
-      String promptType = (String)prompt.get(_TYPE.getText());
-      if (promptTypes.containsKey(promptType)) {
-
-        if (promptTypes.get(promptType) == null) {
-        } else if (promptTypes.get(promptType) != null
-            && promptTypes.get(promptType) instanceof Map) {
-          schema = (Map<String, Object>) promptTypes.get(prompt.get(_TYPE.getText()));
-          if (prompt.containsKey(NAME.getText())) {
-            String name = (String) prompt.get(NAME.getText());
-            try {
-              assertValidElementKey(name, name, null);
-            } catch (Exception e) {
-              throw new OdkXlsValidationException(e.getMessage() + " Prompt: '"
-                  + prompt.get(TYPE.getText()) + "' at row " + prompt.get(ROW_NUM_KEY)
-                  + " on sheet: " + section.get(SECTION_NAME.getText()));
-            }
-
-            // deep copy of schema because we are going to add properties recursively
-            schema = (Map<String, Object>) deepCopyObject(schema);
-            recursivelyResolveTypeInDataModel(schema, promptTypes);
-            if ("required".equals((String) section.get(SECTION_NAME.getText()))) {
-              logger.info("*** " + section.get(SECTION_NAME.getText())
-                  + " recursivelyResolveTypeInDataModel " + i);
-              logger.info(gson.toJson(schema));
-              logger.info(gson.toJson(prompt));
-
-            }
-            updateModel(section, prompt, model, schema);
-            if ("required".equals((String) section.get(SECTION_NAME.getText()))) {
-
-              logger.info("*** " + section.get(SECTION_NAME.getText()) + " updateModel " + i);
-              logger.info(gson.toJson(schema));
-              logger.info(gson.toJson(model));
-
-            }
-          } else {
-            if (!(promptTypes.get(promptType) instanceof Map)) {
-              // schema === undefined
-              throw new OdkXlsValidationException("Unrecognized prompt type. Prompt: '"
-                  + prompt.get(TYPE.getText()) + "' at row " + prompt.get(ROW_NUM_KEY)
-                  + " on sheet: " + section.get(SECTION_NAME.getText()));
-            }
-            throw new OdkXlsValidationException(
-                "Expected 'name' but none defined for prompt. Prompt: '"
-                    + prompt.get(TYPE.getText()) + "' at row " + prompt.get(ROW_NUM_KEY)
-                    + " on sheet: " + section.get(SECTION_NAME.getText()));
-          }
-
-
-
-        }
-        logger.info("*** " + section.get(SECTION_NAME.getText()) + " schema " + i);
-        logger.info(gson.toJson(schema));
-        logger.info("*** " + section.get(SECTION_NAME.getText()) + " model " + i);
-        logger.info(gson.toJson(model));
-        i++;
-
-      } else {
-        throw new OdkXlsValidationException(
-            "Unrecognized prompt type. Prompt: '" + prompt.get(TYPE.getText()) + "' at row "
-                + prompt.get(ROW_NUM_KEY) + " on sheet: " + section.get(SECTION_NAME.getText()));
-      }
-
-    }
-
-  }
-
-  public void processOperations(Map<String, Object> section, List<Map<String, Object>> operations,
-      Map<String, Object> model, List<Map<String, Object>> assigns) {
-    for (Map<String, Object> operation : operations) {
-      if (ASSIGN.getText().equals(operation.get(_TOKEN_TYPE.getText()))) {
-        if (operation.containsKey(NAME.getText())) {
-          String name = (String) operation.get(NAME.getText());
-          try {
-            assertValidElementKey(name, name, null);
-          } catch (OdkXlsValidationException e) {
-            throw new OdkXlsValidationException(e.getMessage() + " Assign clause: '"
-                + operation.get(TYPE.getText()) + "' at row " + operation.get(ROW_NUM_KEY)
-                + " on sheet: " + section.get(SECTION_NAME.getText()));
-          }
-          if (operation.get(_DATA_TYPE.getText()) == null) {
-            // no explicit type -- hope that the field gets a value somewhere else...
-            // record name to verify that is the case.
-            Map<String, Object> newSchema = new LinkedHashMap<String, Object>();
-            updateModel(section, operation, model, newSchema);
-            Map<String, Object> assign = new LinkedHashMap<String, Object>();
-            assign.put(OPERATION.getText(), operation);
-            assign.put(SECTION.getText(), section);
-            assigns.add(assign);
-          } else if (promptTypes.containsKey(operation.get(_DATA_TYPE.getText()))) {
-            Object schema = promptTypes.get(operation.get(_DATA_TYPE.getText()));
-            if (schema != null && schema instanceof Map) {
-              // deep copy of schema because we are going to add properties recursively
-
-              schema = deepCopyObject(schema);
-              recursivelyResolveTypeInDataModel(schema, promptTypes);
-              updateModel(section, operation, model, (Map<String, Object>) schema);
-
-            } else if (schema != null) {
-              // schema === undefined
-              throw new OdkXlsValidationException(
-                  "Unrecognized assign type: " + operation.get(_DATA_TYPE.getText()) + ". Clause: '"
-                      + operation.get(TYPE.getText()) + "' at row " + operation.get(ROW_NUM_KEY)
-                      + " on sheet: " + section.get(SECTION_NAME.getText()));
-            } else {
-              throw new OdkXlsValidationException(
-                  "Invalid assign type: " + operation.get(_DATA_TYPE.getText()) + ". Clause: '"
-                      + operation.get(TYPE.getText()) + "' at row " + operation.get(ROW_NUM_KEY)
-                      + " on sheet: " + section.get(SECTION_NAME.getText()));
-            }
-          }
-        } else {
-          throw new OdkXlsValidationException(
-              "Expected 'name' but none defined for assign. Assign: '"
-                  + operation.get(_DATA_TYPE.getText()) + ". Clause: '" + "' at row "
-                  + operation.get(ROW_NUM_KEY) + " on sheet: "
-                  + section.get(SECTION_NAME.getText()));
-        }
-      }
-    }
   }
 
   public void create() {
@@ -195,11 +72,11 @@ public class DataModelCreator {
           if (schema != null) {
             // deep copy of schema because we are going to add properties recursively
 
-            schema = deepCopyObject(schema);
+            schema = ConversionUtils.deepCopyObject(schema);
             // override the promptTypes 'type' with info supplied by the prompt_type sheet.
 
             defn.remove(TYPE.getText());
-            modelSection.put(name, (Map<String, Object>) deepExtendObject(schema, defn));
+            modelSection.put(name, (Map<String, Object>) ConversionUtils.deepExtendObject(schema, defn));
 
           }
         }
@@ -207,103 +84,28 @@ public class DataModelCreator {
       recursivelyResolveTypeInDataModel(modelSection.get(name), promptTypes);
     }
 
-
     Map<String, Object> model = new LinkedHashMap<String, Object>();
     List<Map<String, Object>> assigns = new ArrayList<Map<String, Object>>();
 
-
-    Map<String, Object> sections = (Map<String, Object>) specification.get("sections");
+    Map<String, Object> sections = (Map<String, Object>) specification.get(SECTIONS.getText());
 
     for (Entry<String, Object> sectionEntry : sections.entrySet()) {
       String sectionName = sectionEntry.getKey();
       Map<String, Object> section = (Map<String, Object>) sectionEntry.getValue();
       List<Map<String, Object>> prompts =
           (List<Map<String, Object>>) section.get(PROMPTS.getText());
-      int i = 0;
 
       processPromptSchemas(section, prompts, model);
 
-      /*
-       * Process the 'assign' statements. Two flavors of these statements: assign | name |
-       * calculation -- no prompt_type info assign integer | name | calculation -- prompt_type info
-       * supplied in 'type' column.
-       *
-       * The initial parsing has _token_type = "assign" _data_type = null or "integer",
-       * respectively, for above.
-       */
+
       List<Map<String, Object>> operations =
           (List<Map<String, Object>>) section.get(OPERATIONS.getText());
       processOperations(section, operations, model, assigns);
 
     }
-
     _Dumper._dump_section("model_2217", model);
-
-    // The model tab takes precedence over whatever was defined at the prompt layer.
-
-    // Look for fields defined by the model tab that are also defined by prompts. If the
-    // prompts declare a different data type, then warn the user. Regardless, treat the
-    // model tab as the authority, overriding any inconsistency from the prompt definitions.
-    // NOTE: Warnings can be suppressed by defining model.xxx overrides on each prompt.
-    for (
-
-    Entry<String, Map<String, Object>> modelEntry : modelSection.entrySet()) {
-      String name = modelEntry.getKey();
-      Map<String, Object> mdef = modelEntry.getValue();
-      if (model.containsKey(name)) {
-        Map<String, Object> defn = (Map<String, Object>) model.get(name);
-        Map<String, Object> blankMapA = new LinkedHashMap<String, Object>();
-        Map<String, Object> blankMapB = new LinkedHashMap<String, Object>();
-
-        Map<String, Object> amodb =
-            (Map<String, Object>) deepExtendObject(deepExtendObject(blankMapA, defn), mdef);
-        Map<String, Object> bmoda =
-            (Map<String, Object>) deepExtendObject(deepExtendObject(blankMapB, mdef), defn);
-        ModelConverter.removeIgnorableModelFieldsFromDefinition(amodb);
-        ModelConverter.removeIgnorableModelFieldsFromDefinition(bmoda);
-        amodb.remove(_DEFN.getText());
-        bmoda.remove(_DEFN.getText());
-        ReflectionComparatorFactory reflectionComparatorFactory = new ReflectionComparatorFactory();
-        ReflectionComparator comp = reflectionComparatorFactory.createRefectionComparator(
-            ReflectionComparatorMode.LENIENT_DATES, ReflectionComparatorMode.LENIENT_ORDER);
-
-        if (!comp.isEqual(amodb, bmoda)) {
-          // the model and prompts field definitions are incompatible.
-          // Issue a warning to the user...
-          StringBuilder formatted = new StringBuilder();
-          List<Map<String, Object>> _defn = (List<Map<String, Object>>) defn.get(_DEFN.getText());
-          if (_defn != null) {
-            for (Map<String, Object> def : _defn) {
-              formatted.append(", at row: ").append(def.get(ROW_NUM_KEY)).append(" on sheet: ")
-                  .append(def.get(SECTION_NAME.getText()));
-            }
-
-            Map<String, Object> defn0 =
-                ((List<Map<String, Object>>) (mdef.get(_DEFN.getText()))).get(0);
-
-            // TODO: warnings.warn
-            throw new OdkXlsValidationException(
-                name + " has different definitions at row " + defn0.get(ROW_NUM_KEY) + " on "
-                    + defn0.get(SECTION_NAME.getText()) + " sheet than " + formatted.substring(2)
-                    + " " + defn0.get(SECTION_NAME.getText()) + " sheet takes precedence.");
-          }
-        }
-        // merge the definition from the survey with the model
-        // such that the model takes precedence.
-        List<Map<String, Object>> _defn = (List<Map<String, Object>>) defn.get(_DEFN.getText());
-        Map<String, Object> defn0 =
-            ((List<Map<String, Object>>) (mdef.get(_DEFN.getText()))).get(0);
-        _defn.add(defn0);
-        List<Map<String, Object>> dt = _defn;
-        defn.remove(_DEFN.getText());
-        deepExtendObject(defn, mdef);
-        defn.put(_DEFN.getText(), dt);
-        modelSection.put(name, defn);
-      }
-    }
-
+    mergeModelsPrompts(model);
     _Dumper._dump_section("model_2262", model);
-
 
     // copy over the fields in the prompt model that were not defined in the model tab...
     for (String name : model.keySet()) {
@@ -347,11 +149,186 @@ public class DataModelCreator {
 
       }
     }
-
-
-
   }
 
+  public void mergeModelsPrompts(Map<String, Object> model) {
+    // The model tab takes precedence over whatever was defined at the prompt layer.
+
+    // Look for fields defined by the model tab that are also defined by prompts. If the
+    // prompts declare a different data type, then warn the user. Regardless, treat the
+    // model tab as the authority, overriding any inconsistency from the prompt definitions.
+    // NOTE: Warnings can be suppressed by defining model.xxx overrides on each prompt.
+    for (
+
+    Entry<String, Map<String, Object>> modelEntry : modelSection.entrySet()) {
+      String name = modelEntry.getKey();
+      Map<String, Object> mdef = modelEntry.getValue();
+      if (model.containsKey(name)) {
+        Map<String, Object> defn = (Map<String, Object>) model.get(name);
+        Map<String, Object> blankMapA = new LinkedHashMap<String, Object>();
+        Map<String, Object> blankMapB = new LinkedHashMap<String, Object>();
+
+        Map<String, Object> amodb =
+            (Map<String, Object>) ConversionUtils.deepExtendObject(ConversionUtils.deepExtendObject(blankMapA, defn), mdef);
+        Map<String, Object> bmoda =
+            (Map<String, Object>) ConversionUtils.deepExtendObject(ConversionUtils.deepExtendObject(blankMapB, mdef), defn);
+        ModelConverter.removeIgnorableModelFieldsFromDefinition(amodb);
+        ModelConverter.removeIgnorableModelFieldsFromDefinition(bmoda);
+        amodb.remove(_DEFN.getText());
+        bmoda.remove(_DEFN.getText());
+        ReflectionComparatorFactory reflectionComparatorFactory = new ReflectionComparatorFactory();
+        ReflectionComparator comp = reflectionComparatorFactory.createRefectionComparator(
+            ReflectionComparatorMode.LENIENT_DATES, ReflectionComparatorMode.LENIENT_ORDER);
+
+        if (!comp.isEqual(amodb, bmoda)) {
+          // the model and prompts field definitions are incompatible.
+          // Issue a warning to the user...
+          StringBuilder formatted = new StringBuilder();
+          List<Map<String, Object>> _defn = (List<Map<String, Object>>) defn.get(_DEFN.getText());
+          if (_defn != null) {
+            for (Map<String, Object> def : _defn) {
+              formatted.append(", at row: ").append(def.get(ROW_NUM_KEY)).append(" on sheet: ")
+                  .append(def.get(SECTION_NAME.getText()));
+            }
+
+            Map<String, Object> defn0 =
+                ((List<Map<String, Object>>) (mdef.get(_DEFN.getText()))).get(0);
+
+            // TODO: warnings.warn
+            throw new OdkXlsValidationException(
+                name + " has different definitions at row " + defn0.get(ROW_NUM_KEY) + " on "
+                    + defn0.get(SECTION_NAME.getText()) + " sheet than " + formatted.substring(2)
+                    + " " + defn0.get(SECTION_NAME.getText()) + " sheet takes precedence.");
+          }
+        }
+        // merge the definition from the survey with the model
+        // such that the model takes precedence.
+        List<Map<String, Object>> _defn = (List<Map<String, Object>>) defn.get(_DEFN.getText());
+        Map<String, Object> defn0 =
+            ((List<Map<String, Object>>) (mdef.get(_DEFN.getText()))).get(0);
+        _defn.add(defn0);
+        List<Map<String, Object>> dt = _defn;
+        defn.remove(_DEFN.getText());
+        ConversionUtils.deepExtendObject(defn, mdef);
+        defn.put(_DEFN.getText(), dt);
+        modelSection.put(name, defn);
+      }
+    }
+  }
+
+  public void processPromptSchemas(Map<String, Object> section, List<Map<String, Object>> prompts,
+      Map<String, Object> model) {
+
+    Map<String, Object> schema = null;
+    for (Map<String, Object> prompt : prompts) {
+      String promptType = (String) prompt.get(_TYPE.getText());
+      if (promptTypes.containsKey(promptType)) {
+
+        if (promptTypes.get(promptType) == null) {
+        } else if (promptTypes.get(promptType) != null
+            && promptTypes.get(promptType) instanceof Map) {
+          schema = (Map<String, Object>) promptTypes.get(prompt.get(_TYPE.getText()));
+          if (prompt.containsKey(NAME.getText())) {
+            String name = (String) prompt.get(NAME.getText());
+            try {
+              assertValidElementKey(name, name, null);
+            } catch (Exception e) {
+              throw new OdkXlsValidationException(e.getMessage() + " Prompt: '"
+                  + prompt.get(TYPE.getText()) + "' at row " + prompt.get(ROW_NUM_KEY)
+                  + " on sheet: " + section.get(SECTION_NAME.getText()));
+            }
+
+            // deep copy of schema because we are going to add properties recursively
+            schema = (Map<String, Object>) ConversionUtils.deepCopyObject(schema);
+            recursivelyResolveTypeInDataModel(schema, promptTypes);
+
+            updateModel(section, prompt, model, schema);
+
+          } else {
+            if (!(promptTypes.get(promptType) instanceof Map)) {
+              // schema === undefined
+              throw new OdkXlsValidationException("Unrecognized prompt type. Prompt: '"
+                  + prompt.get(TYPE.getText()) + "' at row " + prompt.get(ROW_NUM_KEY)
+                  + " on sheet: " + section.get(SECTION_NAME.getText()));
+            }
+            throw new OdkXlsValidationException(
+                "Expected 'name' but none defined for prompt. Prompt: '"
+                    + prompt.get(TYPE.getText()) + "' at row " + prompt.get(ROW_NUM_KEY)
+                    + " on sheet: " + section.get(SECTION_NAME.getText()));
+          }
+        }
+      } else {
+        throw new OdkXlsValidationException(
+            "Unrecognized prompt type. Prompt: '" + prompt.get(TYPE.getText()) + "' at row "
+                + prompt.get(ROW_NUM_KEY) + " on sheet: " + section.get(SECTION_NAME.getText()));
+      }
+    }
+  }
+
+
+  public void processOperations(Map<String, Object> section, List<Map<String, Object>> operations,
+      Map<String, Object> model, List<Map<String, Object>> assigns) {
+
+    /*
+     * Process the 'assign' statements. Two flavors of these statements: assign | name | calculation
+     * -- no prompt_type info assign integer | name | calculation -- prompt_type info supplied in
+     * 'type' column.
+     *
+     * The initial parsing has _token_type = "assign" _data_type = null or "integer", respectively,
+     * for above.
+     */
+    for (Map<String, Object> operation : operations) {
+      if (ASSIGN.getText().equals(operation.get(_TOKEN_TYPE.getText()))) {
+        if (operation.containsKey(NAME.getText())) {
+          String name = (String) operation.get(NAME.getText());
+          try {
+            assertValidElementKey(name, name, null);
+          } catch (OdkXlsValidationException e) {
+            throw new OdkXlsValidationException(e.getMessage() + " Assign clause: '"
+                + operation.get(TYPE.getText()) + "' at row " + operation.get(ROW_NUM_KEY)
+                + " on sheet: " + section.get(SECTION_NAME.getText()));
+          }
+          if (operation.get(_DATA_TYPE.getText()) == null) {
+            // no explicit type -- hope that the field gets a value somewhere else...
+            // record name to verify that is the case.
+            Map<String, Object> newSchema = new LinkedHashMap<String, Object>();
+            updateModel(section, operation, model, newSchema);
+            Map<String, Object> assign = new LinkedHashMap<String, Object>();
+            assign.put(OPERATION.getText(), operation);
+            assign.put(SECTION.getText(), section);
+            assigns.add(assign);
+          } else if (promptTypes.containsKey(operation.get(_DATA_TYPE.getText()))) {
+            Object schema = promptTypes.get(operation.get(_DATA_TYPE.getText()));
+            if (schema != null && schema instanceof Map) {
+              // deep copy of schema because we are going to add properties recursively
+
+              schema = ConversionUtils.deepCopyObject(schema);
+              recursivelyResolveTypeInDataModel(schema, promptTypes);
+              updateModel(section, operation, model, (Map<String, Object>) schema);
+
+            } else if (schema != null) {
+              // schema === undefined
+              throw new OdkXlsValidationException(
+                  "Unrecognized assign type: " + operation.get(_DATA_TYPE.getText()) + ". Clause: '"
+                      + operation.get(TYPE.getText()) + "' at row " + operation.get(ROW_NUM_KEY)
+                      + " on sheet: " + section.get(SECTION_NAME.getText()));
+            } else {
+              throw new OdkXlsValidationException(
+                  "Invalid assign type: " + operation.get(_DATA_TYPE.getText()) + ". Clause: '"
+                      + operation.get(TYPE.getText()) + "' at row " + operation.get(ROW_NUM_KEY)
+                      + " on sheet: " + section.get(SECTION_NAME.getText()));
+            }
+          }
+        } else {
+          throw new OdkXlsValidationException(
+              "Expected 'name' but none defined for assign. Assign: '"
+                  + operation.get(_DATA_TYPE.getText()) + ". Clause: '" + "' at row "
+                  + operation.get(ROW_NUM_KEY) + " on sheet: "
+                  + section.get(SECTION_NAME.getText()));
+        }
+      }
+    }
+  }
 
   /**
    * Helper function for constructing and assigning the elementKey in the model
@@ -504,10 +481,10 @@ public class DataModelCreator {
       Map<String, Object> blankMapA = new LinkedHashMap<String, Object>();
       Map<String, Object> blankMapB = new LinkedHashMap<String, Object>();
 
-      Map<String, Object> amodb = (Map<String, Object>) deepExtendObject(
-          deepExtendObject(deepExtendObject(blankMapA, defn), schema), mdef);
-      Map<String, Object> bmoda = (Map<String, Object>) deepExtendObject(
-          deepExtendObject(deepExtendObject(blankMapB, schema), mdef), defn);
+      Map<String, Object> amodb = (Map<String, Object>) ConversionUtils.deepExtendObject(
+          ConversionUtils.deepExtendObject(ConversionUtils.deepExtendObject(blankMapA, defn), schema), mdef);
+      Map<String, Object> bmoda = (Map<String, Object>) ConversionUtils.deepExtendObject(
+          ConversionUtils.deepExtendObject(ConversionUtils.deepExtendObject(blankMapB, schema), mdef), defn);
 
       ModelConverter.removeIgnorableModelFieldsFromDefinition(amodb);
       ModelConverter.removeIgnorableModelFieldsFromDefinition(bmoda);
@@ -541,7 +518,7 @@ public class DataModelCreator {
       List<Map<String, Object>> dt = (List<Map<String, Object>>) defn.get(_DEFN.getText());
       defn.remove(_DEFN.getText());
 
-      deepExtendObject(deepExtendObject(defn, schema), mdef);
+      ConversionUtils.deepExtendObject(ConversionUtils.deepExtendObject(defn, schema), mdef);
       defn.put(_DEFN.getText(), dt);
 
 
@@ -555,7 +532,7 @@ public class DataModelCreator {
       Map<String, Object> newDefn = new LinkedHashMap<String, Object>();
       newDefn.put(_DEFN.getText(), _defn);
 
-      Object newModel = deepExtendObject(deepExtendObject(newDefn, schema), mdef);
+      Object newModel = ConversionUtils.deepExtendObject(ConversionUtils.deepExtendObject(newDefn, schema), mdef);
       model.put(name, newModel);
       defn = (Map<String, Object>) model.get(name);
     }
@@ -584,10 +561,10 @@ public class DataModelCreator {
               Object schema = promptTypes.get(type);
               if (schema != null) {
                 // deep copy of schema because we are going to add properties recursively
-                schema = deepCopyObject(schema);
+                schema = ConversionUtils.deepCopyObject(schema);
                 // override the promptTypes 'type' with info supplied by the prompt_type sheet.
                 defn.remove(TYPE.getText());
-                properties.put(propertyEntry.getKey(), deepExtendObject(schema, defn));
+                properties.put(propertyEntry.getKey(), ConversionUtils.deepExtendObject(schema, defn));
               }
             }
           }
@@ -603,10 +580,10 @@ public class DataModelCreator {
             Object schema = promptTypes.get(type);
             if (schema != null) {
               // deep copy of schema because we are going to add properties recursively
-              schema = deepCopyObject(schema);
+              schema = ConversionUtils.deepCopyObject(schema);
               // override the promptTypes 'type' with info supplied by the prompt_type sheet.
               defn.remove(TYPE.getText());
-              termMap.put(ITEMS.getText(), deepExtendObject(schema, defn));
+              termMap.put(ITEMS.getText(), ConversionUtils.deepExtendObject(schema, defn));
 
             }
           }
@@ -615,58 +592,4 @@ public class DataModelCreator {
       }
     }
   }
-
-  static Object deepCopyObject(Object o) {
-    Cloner cloner = new Cloner();
-    return cloner.deepClone(o);
-  }
-
-  private static boolean isMapOrList(Object o) {
-    return (o instanceof List || o instanceof Map || o instanceof Object[]);
-  }
-
-  private static boolean isList(Object o) {
-    return (o instanceof List || o instanceof Object[]);
-  }
-
-  static Object deepExtendObject(Object o1, Object o2) {
-    // stomp on o1 if o2 is not an object or array...
-    if (o2 == null || !isMapOrList(o2)) {
-      // don't need to deeply copy these non-array, non-objects.
-      return o2;
-    }
-    // stomp on o1 if o1 is not an object or array...
-    if (o1 == null || !isMapOrList(o1)) {
-      // deep copy it...
-      return deepCopyObject(o2);
-    }
-    // if o1 or o2 are arrays, stomp on o1 (don't merge arrays)...
-    if (isList(o1) || isList(o2)) {
-      // deep copy it...
-      return deepCopyObject(o2);
-    }
-
-    // OK. they are both objects...
-    if (o1 instanceof Map && o2 instanceof Map) {
-      Map<String, Object> map1 = (Map<String, Object>) o1;
-      Map<String, Object> map2 = (Map<String, Object>) o2;
-
-      for (String key : map2.keySet()) {
-        if (map1.containsKey(key)) {
-          deepExtendObject(map1.get(key), map2.get(key));
-        } else {
-          map1.put(key, map2.get(key));
-        }
-
-      }
-
-    } else {
-      throw new OdkXlsValidationException(
-          "Trying to copy a map that is not a map during data model creation.");
-    }
-
-
-    // return the extended object
-    return o1;
-  };
 }

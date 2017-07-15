@@ -10,15 +10,27 @@ public enum Token {
   DISPLAYNAME("displayName"),
   DISPLAY("display"),
   TITLE("title"),
+  VALUE("value"),
   VALUES_LIST("values_list"),
   VALUESLIST("valuesList"), // Why?  WHY?
   SECTION("section"),
+  SECTIONS("sections"),
   OPERATION("operation"),
   ELEMENTKEY("elementKey"),
+  ELEMENTNAME("elementName"),
+  ELEMENTPATH("elementPath"),
+  ELEMENTSET("elementSet"),
+  ELEMENTTYPE("elementType"),
+  ISNOTNULLABLE("isNotNullable"),
+  LISTCHILDELEMENTKEYS("listChildElementKeys"),
+  ISSESSIONVARIABLE("isSessionVariable"),
+  NOTUNITOFRETENTION("notUnitOfRetention"),
   OBJECT("object"),
   ARRAY("array"),
   COMMENT("comment"),
-  COMMENTS("comments");
+  COMMENTS("comments"),
+  TABLE_ID("table_id"),
+  DATATABLEMODEL("dataTableModel")
 ;
   
 

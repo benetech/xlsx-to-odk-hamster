@@ -46,26 +46,12 @@ public class SpecificationConverter {
     addSectionsToSettings();
     parseSections();
     developDataModel();
+    SpecificationValidator.checkValuesList(specification);
+    createDataTableModel();
 
   }
 
-  public void parseSections() {
-    SectionParser sectionParser = new SectionParser();
-    Map<String, Map<String, Object>> newSections = sectionParser.parseSections(sectionNames, sectionSheets, 
-        (Map<String, Map<String, Object>>)specification.get(SETTINGS.getSheetName()), 
-        (Map<String,String>)specification.get(COLUMN_TYPES.getSheetName()));
-    specification.put("section_names", sectionNames);
-    specification.put("sections", newSections);
 
-
-  }
-
-  public void developDataModel() {
-    DataModelCreator dataModelCreator = new DataModelCreator(specification, promptTypes) ;
-    dataModelCreator.create();
-    _Dumper._dump_section("developDataModel_2914", specification.get(MODEL.getSheetName()));
-
-  }
   
   public void addColumnTypesSection() {
     // TODO: Add custom column types
@@ -151,8 +137,31 @@ public class SpecificationConverter {
     }
   }
 
-  
 
+  public void parseSections() {
+    SectionParser sectionParser = new SectionParser();
+    Map<String, Map<String, Object>> newSections = sectionParser.parseSections(sectionNames, sectionSheets, 
+        (Map<String, Map<String, Object>>)specification.get(SETTINGS.getSheetName()), 
+        (Map<String,String>)specification.get(COLUMN_TYPES.getSheetName()));
+    specification.put("section_names", sectionNames);
+    specification.put("sections", newSections);
+
+
+  }
+
+
+  public void developDataModel() {
+    DataModelCreator dataModelCreator = new DataModelCreator(specification, promptTypes) ;
+    dataModelCreator.create();
+    _Dumper._dump_section("developDataModel_2914", specification.get(MODEL.getSheetName()));
+
+  }
+  
+  public void createDataTableModel() {
+    DataTableModelCreator dataTableModelCreator = new DataTableModelCreator(specification) ;
+    dataTableModelCreator.create();
+  }
+  
   public Map<String, Object> getSpecification() {
     return specification;
   }
