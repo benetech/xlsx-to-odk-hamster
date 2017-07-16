@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.benetech.xlsxjson.Xlsx2JsonConverter;
 import org.benetech.xlsxjson.Xlsx2JsonConverterBuilder;
 import org.benetech.xlsxodk.conversion.SpecificationConverter;
+import org.benetech.xlsxodk.util.CsvConversionUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,7 +29,11 @@ public class Xlsx2OdkConverter {
 
   private Xlsx2JsonConverter xlsx2Json;
 
-  Map<String, List<Map<String, Object>>> xlsxSection;
+  private Map<String, List<Map<String, Object>>> xlsxSection;
+  
+  private String definitionsCsv;
+  
+  private String propertiesCsv;
 
   public Xlsx2OdkConverter(boolean dotsToNested, boolean addRowNums) {
     this.dotsToNested = dotsToNested;
@@ -52,6 +57,8 @@ public class Xlsx2OdkConverter {
     Map<String, Object> formDef = new LinkedHashMap<String, Object>();
     formDef.put("xlsx", xlsxSection);
     formDef.put("specification", specificationConverter.getSpecification());
+    definitionsCsv = CsvConversionUtils.createDefinitionCsvFromDataTableModel(specificationConverter.getDataTableModel());
+    propertiesCsv = CsvConversionUtils.createPropertiesCsv(specificationConverter.getProperties());
     return formDef;
   }
 
@@ -71,4 +78,14 @@ public class Xlsx2OdkConverter {
     this.addRowNums = addRowNums;
   }
 
+  public String getDefinitionsCsv() {
+    return definitionsCsv;
+  }
+
+  public String getPropertiesCsv() {
+    return propertiesCsv;
+  }
+
+  
+  
 }

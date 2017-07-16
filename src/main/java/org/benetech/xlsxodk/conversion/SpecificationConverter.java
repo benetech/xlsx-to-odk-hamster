@@ -1,5 +1,8 @@
 package org.benetech.xlsxodk.conversion;
+
 import static org.benetech.xlsxodk.PredefSheet.CALCULATES;
+import static org.benetech.xlsxjson.Xlsx2JsonConverter.ROW_NUM_KEY;
+
 import static org.benetech.xlsxodk.PredefSheet.CHOICES;
 import static org.benetech.xlsxodk.PredefSheet.COLUMN_TYPES;
 import static org.benetech.xlsxodk.PredefSheet.INITIAL;
@@ -7,6 +10,8 @@ import static org.benetech.xlsxodk.PredefSheet.MODEL;
 import static org.benetech.xlsxodk.PredefSheet.PROMPT_TYPES;
 import static org.benetech.xlsxodk.PredefSheet.QUERIES;
 import static org.benetech.xlsxodk.PredefSheet.SETTINGS;
+import static org.benetech.xlsxodk.Token.DATATABLEMODEL;
+import static org.benetech.xlsxodk.Token.PROPERTIES;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.benetech.xlsxodk.Constants;
+import org.benetech.xlsxodk.util.ConversionUtils;
 import org.benetech.xlsxodk.util._Dumper;
 import org.benetech.xlsxodk.validation.SpecificationValidator;
 
@@ -32,6 +38,7 @@ public class SpecificationConverter {
   Map<String, List<Map<String, Object>>> sectionSheets;
 
   public SpecificationConverter(Map<String, List<Map<String, Object>>> originalXlsx) {
+    //originalXlsx = createExtraRowNumCopy(originalXlsx);
     specification = new LinkedHashMap<String, Object>();
     addColumnTypesSection();
     addSettingsSection(originalXlsx);
@@ -52,8 +59,22 @@ public class SpecificationConverter {
 
   }
 
+  Map<String, List<Map<String, Object>>> createExtraRowNumCopy(
+      Map<String, List<Map<String, Object>>> xlsx) {
+    Map<String, List<Map<String, Object>>> newXlsx =
+        (Map<String, List<Map<String, Object>>>) ConversionUtils.deepCopyObject(xlsx);
+    for (String sheetName : newXlsx.keySet()) {
+      List<Map<String, Object>> sheet = newXlsx.get(sheetName);
+      for (int i = 0; i < sheet.size(); i++) {
+        Integer rowNum = (Integer) sheet.get(i).get(ROW_NUM_KEY);
+        if (rowNum != null) {
+          sheet.get(i).put("__rowNum__", rowNum - 1);
+        }
+      }
+    }
+    return newXlsx;
+  }
 
-  
   public void addColumnTypesSection() {
     // TODO: Add custom column types
     specification.put(COLUMN_TYPES.getSheetName(), Constants.COLUMN_TYPE_MAP);
@@ -61,33 +82,28 @@ public class SpecificationConverter {
   }
 
   public void addSettingsSection(Map<String, List<Map<String, Object>>> xlsx) {
-    SettingsConverter settingsConverter =
-        new SettingsConverter(xlsx.get(SETTINGS.getSheetName()));
+    SettingsConverter settingsConverter = new SettingsConverter(xlsx.get(SETTINGS.getSheetName()));
     specification.put(SETTINGS.getSheetName(), settingsConverter.getSettingsMap());
 
   }
 
   public void addChoicesSection(Map<String, List<Map<String, Object>>> xlsx) {
-    ChoicesConverter choicesConverter =
-        new ChoicesConverter(xlsx.get(CHOICES.getSheetName()));
+    ChoicesConverter choicesConverter = new ChoicesConverter(xlsx.get(CHOICES.getSheetName()));
     specification.put(CHOICES.getSheetName(), choicesConverter.getChoicesMap());
 
   }
 
   public void addQueriesSection(Map<String, List<Map<String, Object>>> xlsx) {
-    QueriesConverter queriesConverter =
-        new QueriesConverter(xlsx.get(QUERIES.getSheetName()));
+    QueriesConverter queriesConverter = new QueriesConverter(xlsx.get(QUERIES.getSheetName()));
     SpecificationValidator.checkQueriesChoicesColumnsDuplicates(queriesConverter.getQueriesMap(),
-        (Map<String, List<Map<String, Object>>>) specification
-            .get(QUERIES.getSheetName()));
+        (Map<String, List<Map<String, Object>>>) specification.get(QUERIES.getSheetName()));
     specification.put(QUERIES.getSheetName(), queriesConverter.getQueriesMap());
   }
 
   public void addCalculatesSection(Map<String, List<Map<String, Object>>> xlsx) {
     CalculatesConverter calculatesConverter =
         new CalculatesConverter(xlsx.get(CALCULATES.getSheetName()));
-    specification.put(CALCULATES.getSheetName(),
-        calculatesConverter.getCalculationsMap());
+    specification.put(CALCULATES.getSheetName(), calculatesConverter.getCalculationsMap());
   }
 
   public void setPromptTypes(Map<String, List<Map<String, Object>>> xlsx) {
@@ -107,7 +123,7 @@ public class SpecificationConverter {
       sectionNames = new ArrayList<String>();
     }
     if (sectionSheets == null) {
-       sectionSheets = new LinkedHashMap<String, List<Map<String, Object>>>();
+      sectionSheets = new LinkedHashMap<String, List<Map<String, Object>>>();
     }
     for (String sheetName : xlsx.keySet()) {
       if (!Constants.RESERVED_SHEET_NAMES.contains(sheetName) && !(sheetName.startsWith("-"))) {
@@ -141,9 +157,10 @@ public class SpecificationConverter {
 
   public void parseSections() {
     SectionParser sectionParser = new SectionParser();
-    Map<String, Map<String, Object>> newSections = sectionParser.parseSections(sectionNames, sectionSheets, 
-        (Map<String, Map<String, Object>>)specification.get(SETTINGS.getSheetName()), 
-        (Map<String,String>)specification.get(COLUMN_TYPES.getSheetName()));
+    Map<String, Map<String, Object>> newSections =
+        sectionParser.parseSections(sectionNames, sectionSheets,
+            (Map<String, Map<String, Object>>) specification.get(SETTINGS.getSheetName()),
+            (Map<String, String>) specification.get(COLUMN_TYPES.getSheetName()));
     specification.put("section_names", sectionNames);
     specification.put("sections", newSections);
 
@@ -152,23 +169,29 @@ public class SpecificationConverter {
 
 
   public void developDataModel() {
-    DataModelCreator dataModelCreator = new DataModelCreator(specification, promptTypes) ;
+    DataModelCreator dataModelCreator = new DataModelCreator(specification, promptTypes);
     dataModelCreator.create();
     _Dumper._dump_section("developDataModel_2914", specification.get(MODEL.getSheetName()));
 
   }
-  
+
   public void createDataTableModel() {
-    DataTableModelCreator dataTableModelCreator = new DataTableModelCreator(specification) ;
+    DataTableModelCreator dataTableModelCreator = new DataTableModelCreator(specification);
     dataTableModelCreator.create();
   }
-  
+
   public void addPropertiesSection(Map<String, List<Map<String, Object>>> xlsx) {
-    PropertiesConverter propertiesConverter =
-        new PropertiesConverter(specification, xlsx);
-        
+    PropertiesConverter propertiesConverter = new PropertiesConverter(specification, xlsx);
+
+  }
+
+  public Map<String, Object> getDataTableModel() {
+    return (Map<String, Object>)specification.get(DATATABLEMODEL.getText());
   }
   
+  public List<Map<String,Object>> getProperties() {
+    return (List<Map<String,Object>>)specification.get(PROPERTIES.getText());
+  }
   public Map<String, Object> getSpecification() {
     return specification;
   }

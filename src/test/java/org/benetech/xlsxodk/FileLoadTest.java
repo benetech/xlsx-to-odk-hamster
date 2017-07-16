@@ -35,6 +35,11 @@ public class FileLoadTest {
 
     String json = converter.convertToJson(xlsxFile);
     logger.info(json);
+    
+    logger.info(converter.getDefinitionsCsv());
+    
+    logger.info(converter.getPropertiesCsv());
+
   }
 
   @Test

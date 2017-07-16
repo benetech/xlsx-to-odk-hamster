@@ -215,8 +215,6 @@ public class PropertiesConverter {
       processedProperties.add(getNewProperty(TABLE.getText(), DEFAULT.getText(),
           DISPLAYNAME.getText(), OBJECT.getText(), gson.toJson(formTitle)));
 
-
-
       Collections.sort((List<Object>) processedProperties, new Comparator<Object>() {
 
         @Override
