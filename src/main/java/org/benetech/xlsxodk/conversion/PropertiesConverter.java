@@ -8,9 +8,9 @@ import static org.benetech.xlsxodk.PredefSheet.CHOICES;
 import static org.benetech.xlsxodk.Token.*;
 import static org.benetech.xlsxodk.UnderscoreToken.*;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -216,15 +216,31 @@ public class PropertiesConverter {
           DISPLAYNAME.getText(), OBJECT.getText(), gson.toJson(formTitle)));
 
 
-      // Now sort the _key_value_store_active
-      // processedProperties = _.chain(processedProperties)
-      // .sortBy(function(o) {
-      // return o._key;
-      // }).sortBy(function(p) {
-      // return p._aspect;
-      // }).sortBy(function(q) {
-      // return q._partition;
-      // }).value();
+
+      Collections.sort((List<Object>) processedProperties, new Comparator<Object>() {
+
+        @Override
+        public int compare(final Object prop1, final Object prop2) {
+          Map<String, Object> propMap1 = (Map<String, Object>) prop1;
+          Map<String, Object> propMap2 = (Map<String, Object>) prop2;
+
+          int c;
+          String partition1 = (String) propMap1.get(_PARTITION.getText());
+          String partition2 = (String) propMap2.get(_PARTITION.getText());
+          c = StringUtils.compare(partition1, partition2);
+          if (c == 0) {
+            String aspect1 = (String) propMap1.get(_ASPECT.getText());
+            String aspect2 = (String) propMap2.get(_ASPECT.getText());
+            c = StringUtils.compare(aspect1, aspect2);
+          }
+          if (c == 0) {
+            String key1 = (String) propMap1.get(_KEY.getText());
+            String key2 = (String) propMap2.get(_KEY.getText());
+            c = StringUtils.compare(key1, key2);
+          }
+          return c;
+        }
+      });
 
       // These are all the properties that will be written into the properties.csv file.
 
